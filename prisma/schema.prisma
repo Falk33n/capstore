@@ -11,10 +11,10 @@ datasource db {
 }
 
 model User {
-    id            Int      @id @unique @default(autoincrement())
+    id            String    @unique    @id 
     firstName     String
     lastName      String
-    email         String   @unique
+    email         String    @unique
     password      String
 
     @@index([email])

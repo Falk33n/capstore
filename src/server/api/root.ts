@@ -1,4 +1,4 @@
-import { userRouter } from '~/server/api/routers/user/user';
+import { userRouter } from '~/server/api/routers/user';
 import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 
 /**
