@@ -10,12 +10,21 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
+// Model for the User table
 model User {
     id            String    @unique    @id 
     firstName     String
     lastName      String
     email         String    @unique
-    password      String
+    password      Password?
+    admin         Boolean   @default(false)
+}
 
-    @@index([email])
+// Model for the Password table
+model Password {
+    id            String    @unique    @id 
+    salt          String
+    hash          String
+    user          User?     @relation(fields: [userId], references: [id])
+    userId        String    @unique
 }

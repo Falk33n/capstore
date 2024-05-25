@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
-import { generateRandomId } from './_helpers/user.helpers';
+import { generateId, generateSaltHash } from './_helpers/user.helpers';
 
 export const userRouter = createTRPCRouter({
   // User router to create a user on the database
@@ -14,28 +14,41 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
-      return ctx.db.user.create({
+      // Create user in the database
+      const createdUser = await ctx.db.user.create({
         data: {
-          id: generateRandomId(),
+          id: generateId(),
           firstName: input.firstName,
           lastName: input.lastName,
           email: input.email,
-          password: input.password,
         },
       });
+
+      // Genereate salt and hash for secure passwords and create password entry in the Password table
+      const getSaltHash = await generateSaltHash(input.password);
+      await ctx.db.password.create({
+        data: {
+          id: generateId(),
+          salt: getSaltHash.salt,
+          hash: getSaltHash.hashedPassword,
+          userId: createdUser.id,
+        },
+      });
+
+      return createdUser;
     }),
 
   // User router to remove a user from the database
   removeUser: publicProcedure
     .input(
       z.object({
-        id: z.string(),
+        email: z.string(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       return ctx.db.user.delete({
         where: {
-          id: input.id,
+          email: input.email,
         },
       });
     }),
@@ -71,15 +84,21 @@ export const userRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ ctx, input }) => {
+      // Generate new hash and update it in the database
+      const getHash = (await generateSaltHash(input.password)).hashedPassword;
       return ctx.db.user.update({
         where: {
-          id: input.email,
+          email: input.email,
         },
         data: {
           firstName: input.firstName,
           lastName: input.lastName,
           email: input.email,
-          password: input.password,
+          password: {
+            update: {
+              hash: getHash,
+            },
+          },
         },
       });
     }),
