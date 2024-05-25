@@ -6,16 +6,14 @@ import { api } from '~/trpc/react';
 
 export function CreateUser() {
   const router = useRouter();
-  const [firstName, setFirstName] = useState('');
-  const [lastName, setLastName] = useState('');
+  /*   const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState(''); */
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
 
-  const createUser = api.user.createUser.useMutation({
+  const login = api.user.loginUser.useMutation({
     onSuccess: () => {
       router.refresh();
-      setFirstName('');
-      setLastName('');
       setEmail('');
       setPassword('');
     },
@@ -25,16 +23,14 @@ export function CreateUser() {
     <form
       onSubmit={e => {
         e.preventDefault();
-        createUser.mutate({
-          firstName: firstName,
-          lastName: lastName,
+        login.mutate({
           email: email,
           password: password,
         });
       }}
       className='flex flex-col gap-2'
     >
-      <input
+      {/*       <input
         type='text'
         placeholder='fName'
         value={firstName}
@@ -47,7 +43,7 @@ export function CreateUser() {
         value={lastName}
         onChange={e => setLastName(e.target.value)}
         className='w-full rounded-full px-4 py-2 text-black'
-      />
+      /> */}
       <input
         type='text'
         placeholder='email'
@@ -65,9 +61,9 @@ export function CreateUser() {
       <button
         type='submit'
         className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
-        disabled={createUser.isPending}
+        disabled={login.isPending}
       >
-        {createUser.isPending ? 'Submitting...' : 'Submit'}
+        {login.isPending ? 'Submitting...' : 'Submit'}
       </button>
     </form>
   );

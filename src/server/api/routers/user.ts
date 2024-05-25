@@ -1,4 +1,5 @@
 import type { Prisma } from '@prisma/client';
+import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '~/server/api/trpc';
 import { generateId } from './_helpers/all.helpers';
@@ -170,7 +171,8 @@ export const userRouter = createTRPCRouter({
       if (!isPasswordValid) throw new Error('Invalid email or password');
 
       // Create auth cookie and set it in the response
-      generateAuthCookie(user.id);
+      const res = NextResponse.next();
+      generateAuthCookie(user.id, res);
 
       return { message: 'Logged in successfully' };
     }),

@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs';
+import { serialize } from 'cookie';
 import jwt from 'jsonwebtoken';
-import { cookies } from 'next/headers';
+import type { NextResponse } from 'next/server';
 
 // Generate salt and hash for secure passwords
 export async function generateSaltHash(
@@ -12,23 +13,24 @@ export async function generateSaltHash(
 }
 
 // Function to create a JWT token and serialize it into a cookie
-export function generateAuthCookie(userId: string): void {
+export function generateAuthCookie(userId: string, res: NextResponse) {
   if (!process.env.SECRET_JWT_KEY)
     throw new Error('SECRET_JWT_KEY is undefined');
 
   const token = jwt.sign({ userId }, process.env.SECRET_JWT_KEY, {
-    expiresIn: '2h',
+    expiresIn: '24h',
   });
 
-  // Set the cookie
-  cookies().set({
-    name: 'authToken',
-    value: token,
+  const serializedCookie = serialize('token', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
+    maxAge: 60 * 60 * 24, // 24 hours
     path: '/',
-    maxAge: 2 * 60 * 60, // 2 hours in seconds
   });
+
+  res.cookies.set('token', serializedCookie);
+
+  return token;
 }
 
 // Function to authenticate a user
