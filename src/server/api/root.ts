@@ -1,5 +1,5 @@
-import { userRouter } from "~/server/api/routers/user/user";
-import { createCallerFactory, createTRPCRouter } from "~/server/api/trpc";
+import { userRouter } from '~/server/api/routers/user/user';
+import { createCallerFactory, createTRPCRouter } from '~/server/api/trpc';
 
 /**
  * This is the primary router for your server.
