@@ -12,19 +12,19 @@ datasource db {
 
 // Model for the User table
 model User {
-    id            String    @unique    @id 
-    firstName     String
-    lastName      String
-    email         String    @unique
-    password      Password?
-    admin         Boolean   @default(false)
+    id              String      @unique    @id 
+    firstName       String
+    lastName        String
+    email           String      @unique
+    admin           Boolean     @default(false)
+    password        Password?
 }
 
 // Model for the Password table
 model Password {
-    id            String    @unique    @id 
-    salt          String
-    hash          String
-    user          User?     @relation(fields: [userId], references: [id])
-    userId        String    @unique
+    id              String      @unique    @id 
+    salt            String
+    hashedPassword  String
+    user            User        @relation(fields: [userId], references: [id])
+    userId          String      @unique
 }
