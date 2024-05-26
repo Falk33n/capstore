@@ -52,7 +52,7 @@ export function findValidAuthCookie(): {
     process.env.SECRET_JWT_KEY,
   ) as JwtPayload;
 
-  if (decoded) return { isValid: true, id: decoded.id };
+  if (decoded) return { isValid: true, id: decoded.userId };
 
   throw new Error('Unauthorized');
 }

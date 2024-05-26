@@ -29,7 +29,9 @@ export function CreateUser() {
     },
   });
 
-  const { data, isLoading } = api.user.checkSession.useQuery();
+  const { data, isLoading } = api.user.checkSession.useQuery(undefined, {
+    retry: false,
+  });
 
   return (
     <>
