@@ -29,6 +29,13 @@ export function CreateUser() {
     },
   });
 
+  const makeAdmin = api.user.makeAdmin.useMutation({
+    onSuccess: () => {
+      router.refresh();
+      setEmail('');
+    },
+  });
+
   const { data, isLoading } = api.user.checkSession.useQuery(undefined, {
     retry: false,
   });
@@ -121,6 +128,32 @@ export function CreateUser() {
           disabled={login.isPending}
         >
           {login.isPending ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          makeAdmin.mutate({
+            email: email,
+          });
+        }}
+        className='flex flex-col gap-2'
+      >
+        <h1>Make admin</h1>
+        <input
+          type='text'
+          placeholder='email'
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className='w-full rounded-full px-4 py-2 text-black'
+        />
+        <button
+          type='submit'
+          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
+          disabled={makeAdmin.isPending}
+        >
+          {makeAdmin.isPending ? 'Submitting...' : 'Submit'}
         </button>
       </form>
     </>

@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import { cn } from '../../_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 export function Skeleton({
   className,
@@ -7,7 +7,10 @@ export function Skeleton({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn('animate-pulse rounded-md bg-muted', className)}
+      className={cn(
+        'animate-pulse rounded-md bg-muted-foreground/20',
+        className,
+      )}
       {...props}
     />
   );

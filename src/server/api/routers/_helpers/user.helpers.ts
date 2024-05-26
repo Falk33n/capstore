@@ -1,3 +1,4 @@
+import { TRPCError } from '@trpc/server';
 import bcrypt from 'bcryptjs';
 import { serialize } from 'cookie';
 import jwt from 'jsonwebtoken';
@@ -65,4 +66,17 @@ export async function authenticatePassword(
 ): Promise<boolean> {
   const hash = await bcrypt.hash(password, storedSalt);
   return hash === storedHashedPassword;
+}
+
+export function unknownUser(boolean: boolean) {
+  if (boolean)
+    throw new TRPCError({
+      code: 'NOT_FOUND',
+      message: 'User not found',
+    });
+}
+
+export function unauthorizedUser(boolean: boolean) {
+  if (boolean)
+    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import type { ToastActionElement, ToastProps } from './toast';
+import type { ToastActionElement, ToastProps } from './_index';
 // Inspired by react-hot-toast library
 
 const TOAST_LIMIT = 1;
