@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useEffect, type ReactNode } from 'react';
 import { api } from '~/trpc/react';
-import { PageSkeleton, useToast } from './';
+import { PageSkeleton, useToast } from '../_index';
 
 // Seperate component to ensure only this component is a client component
 export function AdminCheck({ children }: { children: ReactNode }) {
@@ -28,7 +28,7 @@ export function AdminCheck({ children }: { children: ReactNode }) {
   if (isLoading) return <PageSkeleton />;
   if (data?.isValid && !isLoading)
     return (
-      <div className='w-full h-screen flex items-center justify-center bg-card'>
+      <div className='w-full flex items-center justify-center bg-card'>
         {children}
       </div>
     );

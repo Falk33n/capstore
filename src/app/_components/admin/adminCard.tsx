@@ -1,15 +1,23 @@
 'use client';
 
-import { LucideChevronRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { Button, Card, CardDescription, CardHeader, CardTitle } from './';
+import {
+  Button,
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '../_index';
 
 export function AdminCard({
+  className,
   title,
   desc,
   children,
 }: {
+  className?: string;
   title: string;
   desc: string;
   children: ReactNode;
@@ -17,7 +25,10 @@ export function AdminCard({
   const router = useRouter();
 
   return (
-    <Card className='relative' onClick={() => router.push('/admin/statistics')}>
+    <Card
+      className={`relative ${className}`}
+      onClick={() => router.push('/admin/statistics')}
+    >
       <Button
         variant='icon'
         size='icon'
@@ -25,7 +36,7 @@ export function AdminCard({
         title='Go to statistics page'
         className='absolute top-1/2 -translate-y-1/2 right-2'
       >
-        <LucideChevronRight className='size-full' />
+        <ChevronRight className='size-full' />
       </Button>
       <div className='absolute top-1/2 -translate-y-1/2 left-4 bg-primary/20 p-2.5 rounded-xl [&>svg]:size-7'>
         {children}
