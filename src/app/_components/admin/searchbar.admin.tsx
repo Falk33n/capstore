@@ -18,13 +18,14 @@ import {
 export function AdminSearchbar() {
   const [show, setShow] = useState(false);
 
+  // Render a searchbar for the admin panel
   return (
     <Command
-      className='rounded-lg border shadow-md mt-3.5 mb-6 hover:shadow-xl transition-shadow'
+      className='rounded-lg border shadow-xs mt-3.5 mb-6 hover:shadow-xl transition-shadow'
       onFocus={() => setShow(true)}
       onBlur={() => setShow(false)}
     >
-      <CommandInput placeholder='Type a command or search...' />
+      <CommandInput placeholder='Search...' />
       <CommandList>
         {show && (
           <>

@@ -24,6 +24,7 @@ export function AdminCard({
 }) {
   const router = useRouter();
 
+  // Render a card with a button to go to the statistics page
   return (
     <Card
       className={`relative ${className}`}
