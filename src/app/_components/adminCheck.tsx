@@ -9,7 +9,7 @@ import { PageSkeleton, useToast } from './';
 export function AdminCheck({ children }: { children: ReactNode }) {
   const router = useRouter();
   const { toast } = useToast();
-  const { data, isLoading } = api.user.checkSession.useQuery(undefined, {
+  const { data, isLoading } = api.user.checkAdminSession.useQuery(undefined, {
     retry: false,
   });
 

@@ -8,7 +8,9 @@ import {
   generateAuthCookie,
   generateId,
   generateSaltHash,
+  unauthorizedUser,
   unknownError,
+  unknownUser,
 } from './_helpers/';
 
 export const userRouter = createTRPCRouter({
@@ -81,11 +83,7 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        if (!deleteUser)
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User not found',
-          });
+        unknownUser(!deleteUser);
 
         return deleteUser;
       } catch (e) {
@@ -109,11 +107,7 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        if (!findUser)
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User not found',
-          });
+        unknownUser(!findUser);
 
         return findUser;
       } catch (e) {
@@ -137,11 +131,7 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        if (!findUser)
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User not found',
-          });
+        unknownUser(!findUser);
 
         return findUser;
       } catch (e) {
@@ -186,11 +176,7 @@ export const userRouter = createTRPCRouter({
           data: updateData,
         });
 
-        if (!updatedUser)
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User not found',
-          });
+        unknownUser(!updatedUser);
 
         // If password is provided, update the Password table
         if (password) {
@@ -206,6 +192,37 @@ export const userRouter = createTRPCRouter({
         }
 
         return updatedUser;
+      } catch (e) {
+        // Handle known errors or rethrow unknown errors
+        unknownError(e);
+      }
+    }),
+
+  // User router to make a user an admin
+  makeAdmin: publicProcedure
+    .input(
+      z.object({
+        email: z.string().email(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      try {
+        const { isValid, id } = findValidAuthCookie();
+
+        unauthorizedUser(!isValid || !id);
+
+        /*         const user = await ctx.db.user.findUnique({ where: { id: id } });
+
+        unauthorizedUser(user ? !user.admin : false); */
+
+        const updatedAdmin = await ctx.db.user.update({
+          where: { email: input.email },
+          data: { admin: true },
+        });
+
+        unknownUser(!updatedAdmin);
+
+        return updatedAdmin;
       } catch (e) {
         // Handle known errors or rethrow unknown errors
         unknownError(e);
@@ -232,13 +249,9 @@ export const userRouter = createTRPCRouter({
           },
         });
 
-        if (!user)
-          throw new TRPCError({
-            code: 'NOT_FOUND',
-            message: 'User not found',
-          });
+        unknownUser(!user);
 
-        if (!user.password)
+        if (!user?.password)
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Password was not provided',
@@ -272,8 +285,7 @@ export const userRouter = createTRPCRouter({
     try {
       const { isValid, id } = findValidAuthCookie();
 
-      if (!isValid)
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+      unauthorizedUser(!isValid || !id);
 
       return { isValid, id };
     } catch (e) {
@@ -282,18 +294,16 @@ export const userRouter = createTRPCRouter({
     }
   }),
 
-  // User router to check if a user is logged in via the auth cookie
+  // User router to check if a user is logged in via the auth cookie and a admin
   checkAdminSession: publicProcedure.query(async ({ ctx }) => {
     try {
       const { isValid, id } = findValidAuthCookie();
 
-      if (!isValid || !id)
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+      unauthorizedUser(!isValid || !id);
 
       const user = await ctx.db.user.findUnique({ where: { id: id } });
 
-      if (user && !user.admin)
-        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+      unauthorizedUser(user ? !user.admin : false);
 
       return { isValid, id };
     } catch (e) {
