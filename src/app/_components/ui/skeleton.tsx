@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react';
-import { cn } from '../../_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 export function Skeleton({
   className,

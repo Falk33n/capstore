@@ -8,7 +8,7 @@ import {
   type ElementRef,
   type HTMLAttributes,
 } from 'react';
-import { cn } from 'src/app/_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 const Dialog = DialogPrimitive.Root;
 const DialogTrigger = DialogPrimitive.Trigger;

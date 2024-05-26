@@ -1,12 +1,12 @@
 import { forwardRef, type HTMLAttributes } from 'react';
-import { cn } from 'src/app/_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-xl transition-shadow cursor-pointer',
+        'rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-lg transition-shadow cursor-pointer',
         className,
       )}
       {...props}

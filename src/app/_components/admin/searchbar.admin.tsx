@@ -21,7 +21,7 @@ export function AdminSearchbar() {
   // Render a searchbar for the admin panel
   return (
     <Command
-      className='rounded-lg border shadow-xs mt-3.5 mb-6 hover:shadow-xl transition-shadow'
+      className='rounded-lg border shadow-xs mt-3.5 mb-6 hover:shadow-lg transition-shadow'
       onFocus={() => setShow(true)}
       onBlur={() => setShow(false)}
     >

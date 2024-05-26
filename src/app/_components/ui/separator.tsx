@@ -6,8 +6,7 @@ import {
   type ComponentPropsWithoutRef,
   type ElementRef,
 } from 'react';
-
-import { cn } from 'src/app/_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 const Separator = forwardRef<
   ElementRef<typeof SeparatorPrimitive.Root>,

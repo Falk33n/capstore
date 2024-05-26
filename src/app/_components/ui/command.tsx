@@ -10,7 +10,7 @@ import {
   type HTMLAttributes,
 } from 'react';
 import { Dialog, DialogContent } from 'src/app/_components/ui/dialog';
-import { cn } from 'src/app/_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 const Command = forwardRef<
   ElementRef<typeof CommandPrimitive>,

@@ -9,7 +9,7 @@ import {
   type ElementRef,
   type ReactElement,
 } from 'react';
-import { cn } from '../../_utilities/shadcn.utilities.ts';
+import { cn } from './_index';
 
 const ToastProvider = ToastPrimitives.Provider;
 

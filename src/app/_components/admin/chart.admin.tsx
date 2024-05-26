@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import {
   CartesianGrid,
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -11,6 +10,15 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '../_index';
 
 type VisitorData = {
   date?: string;
@@ -45,19 +53,31 @@ export function AdminChart() {
 
   // Render a chart to show statistics
   return (
-    <ResponsiveContainer
-      className='md:flex-1 md:-ml-8'
-      width='100%'
-      height={450}
-    >
-      <LineChart data={data}>
-        <CartesianGrid strokeDasharray='5 5' />
-        <XAxis dataKey='date' />
-        <YAxis />
-        <Tooltip />
-        <Legend />
-        <Line type='monotone' dataKey='Visitors' stroke='#16A34A' />
-      </LineChart>
-    </ResponsiveContainer>
+    <div className='md:flex-1 md:-ml-8 md:relative'>
+      <ResponsiveContainer width='100%' height={450}>
+        <LineChart data={data}>
+          <CartesianGrid strokeDasharray='5 5' />
+          <XAxis dataKey='date' />
+          <YAxis />
+          <Tooltip />
+          <Line type='monotone' dataKey='Visitors' stroke='#16A34A' />
+        </LineChart>
+      </ResponsiveContainer>
+
+      <Select>
+        <SelectTrigger className='w-[180px]'>
+          <SelectValue placeholder='Select a statistic' />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectGroup>
+            <SelectLabel>Statistics last 30 days</SelectLabel>
+            <SelectItem value='visitors'>Visitors</SelectItem>
+            <SelectItem value='accounts'>New Accounts</SelectItem>
+            <SelectItem value='purchases'>Purchases</SelectItem>
+            <SelectItem value='profit'>Profit</SelectItem>
+          </SelectGroup>
+        </SelectContent>
+      </Select>
+    </div>
   );
 }
