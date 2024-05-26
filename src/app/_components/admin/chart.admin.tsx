@@ -53,8 +53,8 @@ export function AdminChart() {
 
   // Render a chart to show statistics
   return (
-    <div className='md:flex-1 md:-ml-8 md:relative'>
-      <ResponsiveContainer width='100%' height={450}>
+    <div className='md:flex-1 md:-ml-8 md:relative md:-mb-10'>
+      <ResponsiveContainer width='100%' height={380}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray='5 5' />
           <XAxis dataKey='date' />
@@ -65,8 +65,8 @@ export function AdminChart() {
       </ResponsiveContainer>
 
       <Select>
-        <SelectTrigger className='w-[180px]'>
-          <SelectValue placeholder='Select a statistic' />
+        <SelectTrigger className='w-40 md:absolute md:left-16 md:-top-10'>
+          <SelectValue placeholder='Visitors' />
         </SelectTrigger>
         <SelectContent>
           <SelectGroup>
