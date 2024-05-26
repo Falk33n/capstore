@@ -10,11 +10,21 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
+// Model for the User table
+model User {
+    id              String      @unique    @id 
+    firstName       String
+    lastName        String
+    email           String      @unique
+    admin           Boolean     @default(false)
+    password        Password?
+}
 
-    @@index([name])
+// Model for the Password table
+model Password {
+    id              String      @unique    @id 
+    salt            String
+    hashedPassword  String
+    user            User        @relation(fields: [userId], references: [id])
+    userId          String      @unique
 }
