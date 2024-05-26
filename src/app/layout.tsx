@@ -1,7 +1,8 @@
 import { GeistSans } from 'geist/font/sans';
 import type { ReactNode } from 'react';
-import '~/styles/globals.css';
+import '~/styles/globals.scss';
 import { TRPCReactProvider } from '~/trpc/react';
+import { Toaster } from './_components';
 
 export const metadata = {
   title: 'Create T3 App',
@@ -13,7 +14,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang='en' className={`${GeistSans.variable}`}>
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          {children} <Toaster />
+        </TRPCReactProvider>
       </body>
     </html>
   );
