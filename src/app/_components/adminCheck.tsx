@@ -7,8 +7,8 @@ import { PageSkeleton, useToast } from './';
 
 // Seperate component to ensure only this component is a client component
 export function AdminCheck({ children }: { children: ReactNode }) {
-  const router = useRouter();
   const { toast } = useToast();
+  const router = useRouter();
   const { data, isLoading } = api.user.checkAdminSession.useQuery(undefined, {
     retry: false,
   });
