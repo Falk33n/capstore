@@ -6,30 +6,18 @@ import {
   ShoppingCart,
   Users,
 } from 'lucide-react';
-import Link from 'next/link';
 import {
   AdminCard,
-  AdminCheck,
   AdminSearchbar,
+  AdminSession,
+  AdminSidebar,
   Separator,
-} from '../_components/_index';
+} from '../../_components/_index';
 
-export default function Admin() {
+export default function AdminDashboard() {
   return (
-    <AdminCheck>
-      <div>
-        <ul>
-          <li>
-            <Link href='/'>Dashboard</Link>
-          </li>
-          <li>
-            <Link href='/'>Statistics</Link>
-          </li>
-          <li>
-            <Link href='/'>Admin Commands</Link>
-          </li>
-        </ul>
-      </div>
+    <AdminSession>
+      <AdminSidebar />
 
       <div className='flex flex-col gap-3.5 sm:min-h-[87.5%] sm:min-w-[92.5%] min-w-full min-h-full p-4 md:p-12'>
         <section>
@@ -82,6 +70,6 @@ export default function Admin() {
           </AdminCard>
         </div>
       </div>
-    </AdminCheck>
+    </AdminSession>
   );
 }

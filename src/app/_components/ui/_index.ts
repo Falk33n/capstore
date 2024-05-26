@@ -2,6 +2,7 @@ export * from './button';
 export * from './card';
 export * from './command';
 export * from './dialog';
+export * from './drawer';
 export * from './separator';
 export * from './skeleton';
 export * from './toast';

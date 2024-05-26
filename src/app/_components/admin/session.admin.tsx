@@ -6,7 +6,7 @@ import { api } from '~/trpc/react';
 import { PageSkeleton, useToast } from '../_index';
 
 // Seperate component to ensure only this component is a client component
-export function AdminCheck({ children }: { children: ReactNode }) {
+export function AdminSession({ children }: { children: ReactNode }) {
   const { toast } = useToast();
   const router = useRouter();
   const { data, isLoading } = api.user.checkAdminSession.useQuery(undefined, {
