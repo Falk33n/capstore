@@ -26,6 +26,11 @@ export function AdminCheck({ children }: { children: ReactNode }) {
 
   // Render different elements based on if the user is a authenticated admin or not
   if (isLoading) return <PageSkeleton />;
-  if (data?.isValid && !isLoading) return <div>{children}</div>;
+  if (data?.isValid && !isLoading)
+    return (
+      <div className='w-full h-screen flex items-center justify-center bg-card'>
+        {children}
+      </div>
+    );
   return null;
 }

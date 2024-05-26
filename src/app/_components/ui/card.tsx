@@ -1,4 +1,4 @@
-import { HTMLAttributes, forwardRef } from 'react';
+import { forwardRef, type HTMLAttributes } from 'react';
 import { cn } from 'src/app/_utilities/shadcn.utilities.ts';
 
 const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
@@ -6,7 +6,7 @@ const Card = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     <div
       ref={ref}
       className={cn(
-        'rounded-lg border bg-card text-card-foreground shadow-sm',
+        'rounded-lg border bg-card text-card-foreground shadow-sm hover:shadow-xl transition-shadow cursor-pointer',
         className,
       )}
       {...props}
@@ -17,11 +17,7 @@ Card.displayName = 'Card';
 
 const CardHeader = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
   ({ className, ...props }, ref) => (
-    <div
-      ref={ref}
-      className={cn('flex flex-col space-y-1.5 p-6', className)}
-      {...props}
-    />
+    <div ref={ref} className={cn('flex flex-col p-6', className)} {...props} />
   ),
 );
 CardHeader.displayName = 'CardHeader';
