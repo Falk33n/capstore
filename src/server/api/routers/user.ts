@@ -281,4 +281,24 @@ export const userRouter = createTRPCRouter({
       unknownError(e);
     }
   }),
+
+  // User router to check if a user is logged in via the auth cookie
+  checkAdminSession: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const { isValid, id } = findValidAuthCookie();
+
+      if (!isValid || !id)
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+
+      const user = await ctx.db.user.findUnique({ where: { id: id } });
+
+      if (user && !user.admin)
+        throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+
+      return { isValid, id };
+    } catch (e) {
+      // Handle known errors or rethrow unknown errors
+      unknownError(e);
+    }
+  }),
 });
