@@ -1,1 +1,1 @@
-export * from './all.types';
+export * from './charts.types';

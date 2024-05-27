@@ -1,18 +1,12 @@
 import { Eye, HandCoins, ShoppingCart, Users } from 'lucide-react';
-import { CartesianGrid, Legend, Line, Tooltip, XAxis, YAxis } from 'recharts';
 import {
   AdminCard,
   AdminChart,
   AdminSearchbar,
   AdminSession,
   AdminSidebar,
-  ChartLegend,
-  ChartTooltip,
-  ChartXAxisTick,
-  ChartYAxisTick,
   Separator,
 } from '../../_components/_index';
-import { getChartData } from '../../_helpers/_index';
 
 // The main page of the admin route
 export default function AdminDashboard() {
@@ -63,33 +57,7 @@ export default function AdminDashboard() {
         <Separator className='my-3.5' />
 
         <div className='flex flex-col gap-3.5 md:flex-row md:items-center'>
-          <AdminChart getChartData={getChartData}>
-            <CartesianGrid
-              stroke='#ccc'
-              strokeDasharray='2 2'
-              strokeWidth={1}
-            />
-            <XAxis dataKey='date' tick={<ChartXAxisTick />} />
-            <YAxis tick={<ChartYAxisTick />} />
-            <Tooltip content={<ChartTooltip />} />
-            <Legend content={<ChartLegend />} />
-            <Line
-              type='monotone'
-              dataKey='Total New Visitors'
-              stroke='#16A34A'
-            />
-            <Line
-              type='monotone'
-              dataKey='Total New Purchases'
-              stroke='#1E3A8A'
-            />
-            <Line type='monotone' dataKey='Total Profit' stroke='#DC2626' />
-            <Line
-              type='monotone'
-              dataKey='Total New Accounts'
-              stroke='#F59E0B'
-            />
-          </AdminChart>
+          <AdminChart />
 
           <div className='flex flex-col gap-3.5 md:w-[29rem] md:pl-7 md:relative'>
             <Separator

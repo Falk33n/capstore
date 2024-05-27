@@ -1,8 +1,8 @@
-import type { ChartDataProps } from '../_types/all.types';
+import type { ChartDataProps } from '../_types/_index';
 
 // Helper function to get chart data
 export function getChartData(): ChartDataProps[] {
-  const data = [];
+  const data: ChartDataProps[] = [];
   const today = new Date();
   for (let i = 29; i >= 0; i--) {
     const date = new Date(today);
@@ -15,5 +15,6 @@ export function getChartData(): ChartDataProps[] {
       'Total New Accounts': Math.floor(Math.random() * 30) + 1,
     });
   }
+
   return data;
 }

@@ -1,1 +1,1 @@
-export * from './chartStyle.all';
+export * from './chartStyle.all.client';

@@ -1,3 +1,5 @@
+'use client';
+
 import type { LegendProps, TooltipProps } from 'recharts';
 import type {
   ChartXAxisTickProps,
