@@ -53,7 +53,7 @@ export function AdminChart() {
 
   // Render a chart to show statistics
   return (
-    <div className='md:flex-1 md:-ml-8 md:relative md:-mb-10'>
+    <div className='md:flex-1 md:-ml-8 md:-mb-10'>
       <ResponsiveContainer width='100%' height={380}>
         <LineChart data={data}>
           <CartesianGrid strokeDasharray='5 5' />
@@ -63,21 +63,6 @@ export function AdminChart() {
           <Line type='monotone' dataKey='Visitors' stroke='#16A34A' />
         </LineChart>
       </ResponsiveContainer>
-
-      <Select>
-        <SelectTrigger className='w-40 md:absolute md:left-16 md:-top-10'>
-          <SelectValue placeholder='Visitors' />
-        </SelectTrigger>
-        <SelectContent>
-          <SelectGroup>
-            <SelectLabel>Statistics last 30 days</SelectLabel>
-            <SelectItem value='visitors'>Visitors</SelectItem>
-            <SelectItem value='accounts'>New Accounts</SelectItem>
-            <SelectItem value='purchases'>Purchases</SelectItem>
-            <SelectItem value='profit'>Profit</SelectItem>
-          </SelectGroup>
-        </SelectContent>
-      </Select>
     </div>
   );
 }
