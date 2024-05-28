@@ -39,7 +39,7 @@ export function AdminCard({
       >
         <ChevronRight className='size-full' />
       </Button>
-      <div className='absolute top-1/2 -translate-y-1/2 left-4 bg-primary/20 p-2.5 rounded-xl [&>svg]:size-7'>
+      <div className='absolute top-1/2 -translate-y-1/2 left-4 bg-primary text-primary-foreground p-2.5 rounded-xl [&>svg]:size-7'>
         {children}
       </div>
       <CardHeader>

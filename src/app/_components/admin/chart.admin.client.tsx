@@ -34,8 +34,8 @@ export function AdminChart() {
 
   // Render a chart to show statistics
   return (
-    <div className='md:flex-1 md:-ml-8 md:-mb-10'>
-      <ResponsiveContainer width='100%' height={380}>
+    <div className='md:flex-1 md:-ml-8 md:-mb-5'>
+      <ResponsiveContainer width='100%' height={450}>
         <LineChart data={data}>
           <CartesianGrid stroke='#ccc' strokeDasharray='2 2' strokeWidth={1} />
           <XAxis dataKey='date' tick={<ChartXAxisTick />} />

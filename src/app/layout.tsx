@@ -12,8 +12,8 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang='en' className={`${GeistSans.variable}`}>
-      <body>
+    <html lang='en' className={`${GeistSans.variable} h-screen`}>
+      <body className='h-screen'>
         <TRPCReactProvider>
           {children} <Toaster />
         </TRPCReactProvider>

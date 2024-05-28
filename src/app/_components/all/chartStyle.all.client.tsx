@@ -47,7 +47,7 @@ export function ChartTooltip({
         {payload.map((entry, index) => (
           <p key={index} style={{ color: entry.color, marginBottom: '5px' }}>
             {entry.name}:{' '}
-            {entry.name === 'Profit' ? `$${entry.value}` : entry.value}
+            {entry.name === 'Total Profit' ? `$${entry.value}` : entry.value}
           </p>
         ))}
       </div>

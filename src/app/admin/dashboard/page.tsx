@@ -14,7 +14,7 @@ export default function AdminDashboard() {
     <AdminSession>
       <AdminSidebar />
 
-      <div className='flex flex-col gap-3.5 sm:min-h-[87.5%] sm:min-w-[92.5%] min-w-full min-h-full p-4 md:p-12'>
+      <div className='flex flex-col gap-3.5 sm:min-h-[87.5%] sm:min-w-[92.5%] min-w-full min-h-full p-4 md:p-12 md:pt-8'>
         <section>
           <h1 className='text-2xl font-bold'>
             Welcome back insert admin name!
