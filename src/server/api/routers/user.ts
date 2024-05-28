@@ -92,6 +92,28 @@ export const userRouter = createTRPCRouter({
       }
     }),
 
+  // User router to retrieve details about the currently active user
+  getCurrentUser: publicProcedure.query(async ({ ctx }) => {
+    try {
+      const { isValid, id } = findValidAuthCookie();
+
+      unauthorizedUser(!isValid || !id);
+
+      const findUser = await ctx.db.user.findUnique({
+        where: {
+          id: id,
+        },
+      });
+
+      unknownUser(!findUser);
+
+      return findUser;
+    } catch (e) {
+      // Handle known errors or rethrow unknown errors
+      unknownError(e);
+    }
+  }),
+
   // User router to retrieve a user by email from the database
   getUserByEmail: publicProcedure
     .input(
