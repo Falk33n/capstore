@@ -28,7 +28,7 @@ export function AdminCard({
   return (
     <Card
       className={`relative ${className}`}
-      onClick={() => router.push('/admin/statistics')}
+      onMouseDown={() => router.push('/admin/statistics')}
     >
       <Button
         variant='icon'
@@ -36,6 +36,7 @@ export function AdminCard({
         aria-label='Go to statistics page'
         title='Go to statistics page'
         className='absolute top-1/2 -translate-y-1/2 right-2'
+        onClick={() => router.push('/admin/statistics')}
       >
         <ChevronRight className='size-full' />
       </Button>

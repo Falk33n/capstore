@@ -2,6 +2,7 @@ import { Eye, HandCoins, ShoppingCart, Users } from 'lucide-react';
 import {
   AdminCard,
   AdminChart,
+  AdminHeader,
   AdminSearchbar,
   AdminSession,
   AdminSidebar,
@@ -16,9 +17,7 @@ export default function AdminDashboard() {
 
       <div className='flex flex-col gap-3.5 sm:min-h-[87.5%] sm:min-w-[92.5%] min-w-full min-h-full p-4 md:p-12 md:pt-8'>
         <section>
-          <h1 className='text-2xl font-bold'>
-            Welcome back insert admin name!
-          </h1>
+          <AdminHeader />
         </section>
 
         <AdminSearchbar />
@@ -57,7 +56,9 @@ export default function AdminDashboard() {
         <Separator className='my-3.5' />
 
         <div className='flex flex-col gap-3.5 md:flex-row md:items-center'>
-          <AdminChart />
+          <div className='md:flex-1 md:-ml-8 md:-mb-5'>
+            <AdminChart />
+          </div>
 
           <div className='flex flex-col gap-3.5 md:w-[29rem] md:pl-7 md:relative'>
             <Separator
