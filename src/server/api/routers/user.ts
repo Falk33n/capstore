@@ -20,8 +20,9 @@ export const userRouter = createTRPCRouter({
       z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        email: z.string().min(5).email(),
+        email: z.string().email(),
         password: z.string().min(8),
+        confirmPassword: z.string().min(8),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -31,12 +32,17 @@ export const userRouter = createTRPCRouter({
           where: { email: input.email },
         });
 
-        if (existingUser) {
+        if (existingUser)
           throw new TRPCError({
             code: 'CONFLICT',
             message: 'User with this email already exists',
           });
-        }
+
+        if (input.password !== input.confirmPassword)
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Passwords does not match',
+          });
 
         // Generate salt and hash for secure passwords
         const { hashedPassword, salt } = await generateSaltHash(input.password);
@@ -72,7 +78,7 @@ export const userRouter = createTRPCRouter({
   removeUser: publicProcedure
     .input(
       z.object({
-        email: z.string().min(5).email(),
+        email: z.string().email(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -118,7 +124,7 @@ export const userRouter = createTRPCRouter({
   getUserByEmail: publicProcedure
     .input(
       z.object({
-        email: z.string().min(5).email(),
+        email: z.string().email(),
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -172,40 +178,71 @@ export const userRouter = createTRPCRouter({
     }
   }),
 
-  // User router to edit a user on the database
   editUser: publicProcedure
     .input(
       z.object({
-        currentEmail: z.string().email(),
         firstName: z.string().min(1).optional(),
         lastName: z.string().min(1).optional(),
+        currentEmail: z.string().email(),
         email: z.string().email().optional(),
-        password: z.string().min(8).optional(),
+        currentPassword: z.string().min(8),
+        confirmPassword: z.string().min(8),
+        newPassword: z.string().min(8).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { currentEmail, firstName, lastName, email, password } = input;
+        const {
+          currentEmail,
+          firstName,
+          lastName,
+          email,
+          currentPassword,
+          newPassword,
+          confirmPassword,
+        } = input;
         const updateData: Prisma.UserUpdateInput = {};
 
         if (firstName) updateData.firstName = firstName;
         if (lastName) updateData.lastName = lastName;
         if (email) updateData.email = email;
 
-        // Update user in the database
-        const updatedUser = await ctx.db.user.update({
-          where: { email: currentEmail },
-          data: updateData,
-        });
+        // If no update data is provided, throw an error
+        if (Object.keys(updateData).length === 0) {
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'No updates provided',
+          });
+        }
 
-        unknownUser(!updatedUser);
+        // Check if password update is needed and if the passwords match
+        if (
+          !currentPassword ||
+          newPassword !== confirmPassword ||
+          currentPassword !== confirmPassword
+        )
+          throw new TRPCError({
+            code: 'BAD_REQUEST',
+            message: 'Passwords do not match or current password is missing',
+          });
+
+        // Update user in the database if there is data to update
+        let updatedUser;
+        if (Object.keys(updateData).length > 0) {
+          updatedUser = await ctx.db.user.update({
+            where: { email: currentEmail },
+            data: updateData,
+          });
+
+          unknownUser(!updatedUser);
+        }
 
         // If password is provided, update the Password table
-        if (password) {
-          const { hashedPassword, salt } = await generateSaltHash(password);
+        if (newPassword) {
+          const { hashedPassword, salt } = await generateSaltHash(newPassword);
 
           await ctx.db.password.update({
-            where: { userId: updatedUser.id },
+            where: { userId: updatedUser?.id },
             data: {
               hashedPassword: hashedPassword,
               salt: salt,
@@ -214,37 +251,6 @@ export const userRouter = createTRPCRouter({
         }
 
         return updatedUser;
-      } catch (e) {
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
-      }
-    }),
-
-  // User router to make a user an admin
-  makeAdmin: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-      }),
-    )
-    .mutation(async ({ ctx, input }) => {
-      try {
-        const { isValid, id } = findValidAuthCookie();
-
-        unauthorizedUser(!isValid || !id);
-
-        /*         const user = await ctx.db.user.findUnique({ where: { id: id } });
-
-        unauthorizedUser(user ? !user.admin : false); */
-
-        const updatedAdmin = await ctx.db.user.update({
-          where: { email: input.email },
-          data: { admin: true },
-        });
-
-        unknownUser(!updatedAdmin);
-
-        return updatedAdmin;
       } catch (e) {
         // Handle known errors or rethrow unknown errors
         unknownError(e);
