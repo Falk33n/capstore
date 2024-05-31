@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { api } from '~/trpc/react';
+import { api } from './_index';
 
 export function CreateUser() {
   const router = useRouter();
@@ -10,6 +10,7 @@ export function CreateUser() {
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
 
   const register = api.user.createUser.useMutation({
     onSuccess: () => {
@@ -18,6 +19,7 @@ export function CreateUser() {
       setLastName('');
       setEmail('');
       setPassword('');
+      setConfirmPassword('');
     },
   });
 
@@ -48,8 +50,9 @@ export function CreateUser() {
           register.mutate({
             firstName: firstName,
             lastName: lastName,
-            email: email,
-            password: password,
+            currentEmail: email,
+            currentPassword: password,
+            confirmPassword: confirmPassword,
           });
         }}
         className='flex flex-col gap-2'
@@ -96,8 +99,8 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           login.mutate({
-            email: email,
-            password: password,
+            currentEmail: email,
+            currentPassword: password,
           });
         }}
         className='flex flex-col gap-2'

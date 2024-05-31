@@ -3,6 +3,8 @@
 import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
+import { getTodayChartData } from '../../_helpers/charts.helpers';
+import type { ChartAllDataProps } from '../../_types/charts.types';
 import {
   Button,
   Card,
@@ -16,19 +18,28 @@ export function AdminCard({
   title,
   desc,
   children,
+  singleData,
 }: {
   className?: string;
   title: string;
   desc: string;
   children: ReactNode;
+  singleData?: ChartAllDataProps;
 }) {
   const router = useRouter();
+
+  const fetchData = () => {
+    const data = getTodayChartData();
+    return data;
+  };
+
+  singleData = fetchData();
 
   // Render a card with a button to go to the statistics page
   return (
     <Card
       className={`relative ${className}`}
-      onClick={() => router.push('/admin/statistics')}
+      onMouseDown={() => router.push('/admin/statistics')}
     >
       <Button
         variant='icon'
@@ -36,6 +47,7 @@ export function AdminCard({
         aria-label='Go to statistics page'
         title='Go to statistics page'
         className='absolute top-1/2 -translate-y-1/2 right-2'
+        onClick={() => router.push('/admin/statistics')}
       >
         <ChevronRight className='size-full' />
       </Button>
@@ -43,7 +55,10 @@ export function AdminCard({
         {children}
       </div>
       <CardHeader>
-        <CardTitle className='ml-14 pr-5'>{title}</CardTitle>
+        <CardTitle className='ml-14 pr-5'>
+          {JSON.stringify(singleData)}
+          {title}
+        </CardTitle>
         <CardDescription className='pt-2.5 ml-14 pr-5'>{desc}</CardDescription>
       </CardHeader>
     </Card>
