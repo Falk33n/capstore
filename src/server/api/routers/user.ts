@@ -20,8 +20,8 @@ export const userRouter = createTRPCRouter({
       z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        email: z.string().email(),
-        password: z.string().min(8),
+        currentEmail: z.string().email(),
+        currentPassword: z.string().min(8),
         confirmPassword: z.string().min(8),
       }),
     )
@@ -29,7 +29,7 @@ export const userRouter = createTRPCRouter({
       try {
         // Check if user already exists
         const existingUser = await ctx.db.user.findUnique({
-          where: { email: input.email },
+          where: { email: input.currentEmail },
         });
 
         if (existingUser)
@@ -38,14 +38,16 @@ export const userRouter = createTRPCRouter({
             message: 'User with this email already exists',
           });
 
-        if (input.password !== input.confirmPassword)
+        if (input.currentPassword !== input.confirmPassword)
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'Passwords does not match',
           });
 
         // Generate salt and hash for secure passwords
-        const { hashedPassword, salt } = await generateSaltHash(input.password);
+        const { hashedPassword, salt } = await generateSaltHash(
+          input.currentPassword,
+        );
 
         // Create user in the database
         const createdUser = await ctx.db.user.create({
@@ -53,7 +55,7 @@ export const userRouter = createTRPCRouter({
             id: generateId(),
             firstName: input.firstName,
             lastName: input.lastName,
-            email: input.email,
+            email: input.currentEmail,
           },
         });
 
@@ -78,14 +80,14 @@ export const userRouter = createTRPCRouter({
   removeUser: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        currentEmail: z.string().email(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
         const deleteUser = await ctx.db.user.delete({
           where: {
-            email: input.email,
+            email: input.currentEmail,
           },
         });
 
@@ -124,14 +126,14 @@ export const userRouter = createTRPCRouter({
   getUserByEmail: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
+        currentEmail: z.string().email(),
       }),
     )
     .query(async ({ ctx, input }) => {
       try {
         const findUser = await ctx.db.user.findUnique({
           where: {
-            email: input.email,
+            email: input.currentEmail,
           },
         });
 
@@ -184,7 +186,7 @@ export const userRouter = createTRPCRouter({
         firstName: z.string().min(1).optional(),
         lastName: z.string().min(1).optional(),
         currentEmail: z.string().email(),
-        email: z.string().email().optional(),
+        newEmail: z.string().email().optional(),
         currentPassword: z.string().min(8),
         confirmPassword: z.string().min(8),
         newPassword: z.string().min(8).optional(),
@@ -196,7 +198,7 @@ export const userRouter = createTRPCRouter({
           currentEmail,
           firstName,
           lastName,
-          email,
+          newEmail,
           currentPassword,
           newPassword,
           confirmPassword,
@@ -205,7 +207,7 @@ export const userRouter = createTRPCRouter({
 
         if (firstName) updateData.firstName = firstName;
         if (lastName) updateData.lastName = lastName;
-        if (email) updateData.email = email;
+        if (newEmail) updateData.email = newEmail;
 
         // If no update data is provided, throw an error
         if (Object.keys(updateData).length === 0) {
@@ -261,17 +263,15 @@ export const userRouter = createTRPCRouter({
   loginUser: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
-        password: z.string().min(8),
+        currentEmail: z.string().email(),
+        currentPassword: z.string().min(8),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { email, password } = input;
-
         // Find user by email and include the password relation
         const user = await ctx.db.user.findUnique({
-          where: { email },
+          where: { email: input.currentEmail },
           include: {
             password: true,
           },
@@ -287,7 +287,7 @@ export const userRouter = createTRPCRouter({
 
         // Verify password
         const isPasswordValid = await authenticatePassword(
-          password,
+          input.currentPassword,
           user.password.hashedPassword,
           user.password.salt,
         );

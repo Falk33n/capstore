@@ -10,8 +10,8 @@ const userDetails = {
   firstName: '',
   lastName: '',
   currentEmail: '',
-  email: '',
-  password: '',
+  newEmail: '',
+  currentPassword: '',
   confirmPassword: '',
   newPassword: '',
 };
@@ -52,7 +52,7 @@ export function AdminUserCommand({
     refetch: getUserByEmail,
   } = api.user.getUserByEmail.useQuery(
     {
-      email: user.email,
+      currentEmail: user.currentEmail,
     },
     { enabled: false, retry: false },
   );
@@ -118,21 +118,21 @@ export function AdminUserCommand({
           createUser.mutate({
             firstName: user.firstName,
             lastName: user.lastName,
-            email: user.email,
-            password: user.password,
+            currentEmail: user.currentEmail,
+            currentPassword: user.currentPassword,
             confirmPassword: user.confirmPassword,
           });
         else if (actionType === 'remove')
           removeUser.mutate({
-            email: user.email,
+            currentEmail: user.currentEmail,
           });
         else if (actionType === 'edit')
           editUser.mutate({
             firstName: user.firstName,
             lastName: user.lastName,
             currentEmail: user.currentEmail,
-            email: user.email,
-            password: user.password,
+            newEmail: user.newEmail,
+            currentPassword: user.currentPassword,
             newPassword: user.newPassword,
             confirmPassword: user.confirmPassword,
           });
@@ -174,24 +174,24 @@ export function AdminUserCommand({
           </LabelAndInput>
         </>
       )}
-      {actionType === 'edit' && (
+      {(createOrEdit() || email()) && (
         <LabelAndInput
           id='currentEmail'
           autoComplete='email'
           type='email'
           onBlur={e => setUser({ ...user, currentEmail: e.target.value })}
         >
-          Current Email
+          Email
         </LabelAndInput>
       )}
-      {(createOrEdit() || email()) && (
+      {actionType === 'edit' && (
         <LabelAndInput
           id='email'
           autoComplete={actionType === 'edit' ? 'off' : 'email'}
           type='email'
-          onBlur={e => setUser({ ...user, email: e.target.value })}
+          onBlur={e => setUser({ ...user, newEmail: e.target.value })}
         >
-          {actionType === 'edit' ? 'New Email' : 'Email'}
+          New Email
         </LabelAndInput>
       )}
       {createOrEdit() && (
@@ -200,10 +200,19 @@ export function AdminUserCommand({
             id='password'
             autoComplete='new-password'
             type='password'
-            onBlur={e => setUser({ ...user, password: e.target.value })}
+            onBlur={e => setUser({ ...user, currentPassword: e.target.value })}
           >
             Password
           </LabelAndInput>
+          {actionType === 'edit' && (
+            <LabelAndInput
+              id='new-Password'
+              type='password'
+              onBlur={e => setUser({ ...user, newPassword: e.target.value })}
+            >
+              New Password
+            </LabelAndInput>
+          )}
           <LabelAndInput
             id='confirmPassword'
             type='password'
