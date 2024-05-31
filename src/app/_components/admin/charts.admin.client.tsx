@@ -11,8 +11,8 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import { getChartData } from '../../_helpers/_index';
-import type { ChartDataProps } from '../../_types/_index';
+import { getAllChartData } from '../../_helpers/_index';
+import type { ChartAllDataProps } from '../../_types/_index';
 import {
   ChartLegend,
   ChartTooltip,
@@ -20,12 +20,12 @@ import {
   ChartYAxisTick,
 } from '../_index';
 
-export function AdminChart() {
-  const [data, setData] = useState<ChartDataProps[]>([]);
+export function AdminFullChart() {
+  const [data, setData] = useState<ChartAllDataProps[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
-      const data = getChartData();
+      const data = getAllChartData();
       setData(data);
     };
 

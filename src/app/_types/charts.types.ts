@@ -1,10 +1,18 @@
 // Custom types for the chart component
-export type ChartDataProps = {
+export type ChartSingleDataProps = {
+  dates?: string[];
+  totalNewVisitors?: number[];
+  totalNewPurchases?: number[];
+  totalProfit?: number[];
+  totalNewAccounts?: number[];
+};
+
+export type ChartAllDataProps = {
   date?: string;
-  'Total New Visitors'?: number;
-  'Total New Purchases'?: number;
-  'Total Profit'?: number;
-  'Total New Accounts'?: number;
+  totalNewVisitors?: number;
+  totalNewPurchases?: number;
+  totalProfit?: number;
+  totalNewAccounts?: number;
 };
 
 export type ChartXAxisTickProps = {

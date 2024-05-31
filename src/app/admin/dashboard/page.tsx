@@ -1,7 +1,7 @@
 import { Eye, HandCoins, ShoppingCart, Users } from 'lucide-react';
 import {
   AdminCard,
-  AdminChart,
+  AdminFullChart,
   AdminHeader,
   AdminSearchbar,
   AdminSession,
@@ -57,7 +57,7 @@ export default function AdminDashboard() {
 
         <div className='flex flex-col gap-3.5 md:flex-row md:items-center'>
           <div className='md:flex-1 md:-ml-8 md:-mb-5'>
-            <AdminChart />
+            <AdminFullChart />
           </div>
 
           <div className='flex flex-col gap-3.5 md:w-[29rem] md:pl-7 md:relative'>

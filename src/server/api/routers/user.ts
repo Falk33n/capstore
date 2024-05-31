@@ -20,7 +20,7 @@ export const userRouter = createTRPCRouter({
       z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        email: z.string().min(5).email(),
+        email: z.string().email(),
         password: z.string().min(8),
       }),
     )
@@ -72,7 +72,7 @@ export const userRouter = createTRPCRouter({
   removeUser: publicProcedure
     .input(
       z.object({
-        email: z.string().min(5).email(),
+        email: z.string().email(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -118,7 +118,7 @@ export const userRouter = createTRPCRouter({
   getUserByEmail: publicProcedure
     .input(
       z.object({
-        email: z.string().min(5).email(),
+        email: z.string().email(),
       }),
     )
     .query(async ({ ctx, input }) => {

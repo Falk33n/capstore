@@ -15,9 +15,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang='en' className={`${GeistSans.variable} h-screen`}>
       <body className='h-screen'>
         <TRPCReactProvider>
-          <nav></nav>
-          <main>{children}</main>
-          <footer></footer>
+          {children}
           <Toaster />
         </TRPCReactProvider>
       </body>
