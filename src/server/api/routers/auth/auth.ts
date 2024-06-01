@@ -5,10 +5,11 @@ import {
   authenticatePassword,
   checkAdminSession,
   checkSession,
+  checkSuperAdminSession,
   generateAuthCookie,
   unknownError,
   unknownUser,
-} from '../_helpers';
+} from '../_helpers/_index';
 
 export const authRouter = createTRPCRouter({
   // User router to login a user
@@ -64,7 +65,7 @@ export const authRouter = createTRPCRouter({
   checkSession: publicProcedure.query(async () => {
     try {
       return {
-        isValid: await checkSession(),
+        isValid: (await checkSession()).isValid,
         message: 'User is authenticated',
       };
     } catch (e) {
@@ -77,8 +78,21 @@ export const authRouter = createTRPCRouter({
   checkAdminSession: publicProcedure.query(async ({ ctx }) => {
     try {
       return {
-        isValid: await checkAdminSession({ ctx: ctx }),
+        isValid: (await checkAdminSession({ ctx: ctx })).isValid,
         message: 'Admin is authenticated',
+      };
+    } catch (e) {
+      // Handle known errors or rethrow unknown errors
+      unknownError(e);
+    }
+  }),
+
+  // User router to check if a user is logged in via the auth cookie and a super admin
+  checkSuperAdminSession: publicProcedure.query(async ({ ctx }) => {
+    try {
+      return {
+        isValid: (await checkSuperAdminSession({ ctx: ctx })).isValid,
+        message: 'Super Admin is authenticated',
       };
     } catch (e) {
       // Handle known errors or rethrow unknown errors

@@ -3,10 +3,11 @@ import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
   checkAdminSession,
   checkSession,
+  checkSuperAdminSession,
   unauthorizedUser,
   unknownError,
   unknownUser,
-} from '../_helpers';
+} from '../_helpers/_index';
 
 export const userRemoveRouter = createTRPCRouter({
   // User router to let users remove their own accounts
@@ -87,6 +88,25 @@ export const userRemoveRouter = createTRPCRouter({
         unknownUser(!deletedUser);
 
         return { message: 'User deleted successfully' };
+      } catch (e) {
+        // Handle known errors or rethrow unknown errors
+        unknownError(e);
+      }
+    }),
+
+  // User router to let super admins remove all users
+  removeAllUsers: publicProcedure
+    .input(z.object({ superAdminKey: z.string().min(1) }))
+    .mutation(async ({ ctx, input }) => {
+      try {
+        if (input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY)
+          unauthorizedUser(true);
+
+        await checkSuperAdminSession({ ctx: ctx });
+        await ctx.db.user.deleteMany();
+        await ctx.db.password.deleteMany();
+
+        return { message: 'Users and their passwords successfully deleted' };
       } catch (e) {
         // Handle known errors or rethrow unknown errors
         unknownError(e);

@@ -5,7 +5,7 @@ import {
   checkSession,
   unknownError,
   unknownUser,
-} from '../_helpers';
+} from '../_helpers/_index';
 
 export const userGetRouter = createTRPCRouter({
   // User router to retrieve details about the currently active user
