@@ -1,9 +1,9 @@
-import { TRPCError } from '@trpc/server';
 import bcrypt from 'bcryptjs';
 import { serialize } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import type { JwtPayload } from '../_types/user.types';
+import { unauthorizedUser, unknownError, unknownUser } from '.';
+import type { CtxProps, JwtPayloadProp } from '../_types/_index';
 
 // Generate salt and hash for secure passwords
 export async function generateSaltHash(
@@ -11,13 +11,13 @@ export async function generateSaltHash(
 ): Promise<{ hashedPassword: string; salt: string }> {
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);
+  if (!salt || !hashedPassword) unknownError(!salt || !hashedPassword);
   return { hashedPassword, salt };
 }
 
 // Function to create a JWT token and serialize it into a cookie
 export function generateAuthCookie(userId: string, resHeaders: Headers) {
-  if (!process.env.SECRET_JWT_KEY)
-    throw new Error('SECRET_JWT_KEY is undefined');
+  if (!process.env.SECRET_JWT_KEY) unknownError(!process.env.SECRET_JWT_KEY);
 
   const token = jwt.sign({ userId }, process.env.SECRET_JWT_KEY, {
     expiresIn: '2h',
@@ -42,20 +42,18 @@ export function findValidAuthCookie(): {
   id?: string;
 } {
   const token = cookies().get('authCookie');
-
   if (!token) return { isValid: false };
-
-  if (!process.env.SECRET_JWT_KEY)
-    throw new Error('SECRET_JWT_KEY is undefined');
+  if (!process.env.SECRET_JWT_KEY) unknownError(!process.env.SECRET_JWT_KEY);
 
   const decoded = jwt.verify(
     token.value,
     process.env.SECRET_JWT_KEY,
-  ) as JwtPayload;
+  ) as JwtPayloadProp;
 
-  if (decoded) return { isValid: true, id: decoded.userId };
+  unauthorizedUser(!decoded);
+  if (!decoded) return { isValid: false };
 
-  throw new Error('Unauthorized');
+  return { isValid: true, id: decoded.userId };
 }
 
 // Function to authenticate a user
@@ -65,18 +63,22 @@ export async function authenticatePassword(
   storedSalt: string,
 ): Promise<boolean> {
   const hash = await bcrypt.hash(password, storedSalt);
-  return hash === storedHashedPassword;
+  if (hash) return hash === storedHashedPassword;
+  unknownError(!hash);
 }
 
-export function unknownUser(boolean: boolean) {
-  if (boolean)
-    throw new TRPCError({
-      code: 'NOT_FOUND',
-      message: 'User not found',
-    });
+export async function checkSession() {
+  const { isValid, id } = findValidAuthCookie();
+  unauthorizedUser(!isValid || !id);
+  return { isValid, id };
 }
 
-export function unauthorizedUser(boolean: boolean) {
-  if (boolean)
-    throw new TRPCError({ code: 'UNAUTHORIZED', message: 'Unauthorized' });
+export async function checkAdminSession({ ctx }: CtxProps) {
+  const { isValid, id } = await checkSession();
+  const user = await ctx.db.user.findUnique({ where: { id: id } });
+
+  unknownUser(!user);
+  unauthorizedUser(!user?.admin);
+
+  return { isValid, id };
 }
