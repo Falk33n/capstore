@@ -9,7 +9,7 @@ import {
   unauthorizedUser,
   unknownError,
   unknownUser,
-} from '../_helpers';
+} from '../_helpers/_index';
 
 export const userEditRouter = createTRPCRouter({
   // Router to edit a user

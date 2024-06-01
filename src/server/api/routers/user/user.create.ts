@@ -1,7 +1,7 @@
 import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../../trpc';
-import { generateId, generateSaltHash, unknownError } from '../_helpers';
+import { generateId, generateSaltHash, unknownError } from '../_helpers/_index';
 
 export const userCreateRouter = createTRPCRouter({
   // User router to create a user on the database

@@ -2,8 +2,8 @@ import bcrypt from 'bcryptjs';
 import { serialize } from 'cookie';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import { unauthorizedUser, unknownError, unknownUser } from '.';
 import type { CtxProps, JwtPayloadProp } from '../_types/_index';
+import { unauthorizedUser, unknownError, unknownUser } from './_index';
 
 // Generate salt and hash for secure passwords
 export async function generateSaltHash(
@@ -67,18 +67,31 @@ export async function authenticatePassword(
   unknownError(!hash);
 }
 
+// Function to check if a user is authenticated
 export async function checkSession() {
   const { isValid, id } = findValidAuthCookie();
   unauthorizedUser(!isValid || !id);
   return { isValid, id };
 }
 
+// Function to check if a user is authenticated and a admin
 export async function checkAdminSession({ ctx }: CtxProps) {
   const { isValid, id } = await checkSession();
   const user = await ctx.db.user.findUnique({ where: { id: id } });
 
   unknownUser(!user);
   unauthorizedUser(!user?.admin);
+
+  return { isValid, id };
+}
+
+// Function to check if a user is authenticated and a super admin
+export async function checkSuperAdminSession({ ctx }: CtxProps) {
+  const { isValid, id } = await checkSession();
+  const user = await ctx.db.user.findUnique({ where: { id: id } });
+  
+  unknownUser(!user);
+  unauthorizedUser(!user?.admin && !user?.superAdmin);
 
   return { isValid, id };
 }
