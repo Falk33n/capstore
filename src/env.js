@@ -7,8 +7,10 @@ export const env = createEnv({
    * isn't built with invalid env vars.
    */
   server: {
-    DATABASE_URL: z.string().url(),
+    SECRET_DATABASE_URL: z.string().url(),
     SECRET_JWT_KEY: z.string(),
+    SECRET_ADMIN_KEY: z.string(),
+    SECRET_SUPER_ADMIN_KEY: z.string(),
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
       .default('development'),
@@ -28,8 +30,10 @@ export const env = createEnv({
    * middlewares) or client-side so we need to destruct manually.
    */
   runtimeEnv: {
-    DATABASE_URL: process.env.DATABASE_URL,
+    SECRET_DATABASE_URL: process.env.SECRET_DATABASE_URL,
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
+    SECRET_ADMIN_KEY: process.env.SECRET_ADMIN_KEY,
+    SECRET_SUPER_ADMIN_KEY: process.env.SECRET_SUPER_ADMIN_KEY,
     NODE_ENV: process.env.NODE_ENV,
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },

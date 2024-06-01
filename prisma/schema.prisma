@@ -7,7 +7,7 @@ generator client {
 
 datasource db {
     provider = "sqlserver"
-    url      = env("DATABASE_URL")
+    url      = env("SECRET_DATABASE_URL")
 }
 
 // Model for the User table
@@ -17,6 +17,7 @@ model User {
     lastName        String
     email           String      @unique
     admin           Boolean     @default(false)
+    superAdmin      Boolean     @default(false)
     password        Password?
 }
 

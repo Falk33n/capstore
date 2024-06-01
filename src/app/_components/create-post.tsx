@@ -138,7 +138,8 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           makeAdmin.mutate({
-            email: email,
+            id: email,
+            key: 'hello'
           });
         }}
         className='flex flex-col gap-2'
