@@ -16,19 +16,16 @@ model User {
     firstName       String
     lastName        String
     email           String      @unique
-    admin           Boolean     @default(false)
-    superAdmin      Boolean     @default(false)
-    password        Password?
-    country         String
-    city            String
-    zipCode         String
-    address         String
+    role            UserRole?
+    password        UserPassword?
+    address         UserAddress?
+    logs            UserLog[]
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
 }
 
 // Model for the Password table
-model Password {
+model UserPassword {
     id              String      @unique    @id 
     salt            String
     hashedPassword  String
@@ -36,4 +33,37 @@ model Password {
     userId          String      @unique
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
+}
+
+// Model for the Address table
+model UserAddress {
+    id              String      @unique    @id 
+    country         String
+    city            String
+    zipCode         String
+    address         String 
+    user            User        @relation(fields: [userId], references: [id])
+    userId          String      @unique
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+}
+
+// Model for the role table
+model UserRole {
+    id              String      @unique    @id 
+    admin           Boolean     @default(false)
+    superAdmin      Boolean     @default(false) 
+    user            User        @relation(fields: [userId], references: [id])
+    userId          String      @unique
+    createdAt       DateTime    @default(now())
+    updatedAt       DateTime    @updatedAt
+}
+
+// Model for the UserLog table
+model UserLog {
+    id              String      @unique    @id 
+    action          String
+    user            User        @relation(fields: [userId], references: [id])
+    userId          String      @unique
+    createdAt       DateTime    @default(now())
 }
