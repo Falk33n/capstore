@@ -8,37 +8,46 @@ export function CreateUser() {
   const router = useRouter();
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [currentEmail, setCurrentEmail] = useState('');
+  const [id, setId] = useState('');
+  const [country, setCountry] = useState('');
+  const [city, setCity] = useState('');
+  const [zipCode, setZipCode] = useState('');
+  const [address, setAddress] = useState('');
 
-  const register = api.user.createUser.useMutation({
+  const register = api.userCreate.createUser.useMutation({
     onSuccess: () => {
       router.refresh();
       setFirstName('');
       setLastName('');
-      setEmail('');
+      setCurrentEmail('');
       setPassword('');
       setConfirmPassword('');
+      setCountry('');
+      setCity('');
+      setZipCode('');
+      setAddress('');
     },
   });
 
-  const login = api.user.loginUser.useMutation({
+  const login = api.auth.loginUser.useMutation({
     onSuccess: () => {
       router.refresh();
-      setEmail('');
+      setCurrentEmail('');
       setPassword('');
     },
   });
 
-  const makeAdmin = api.user.makeAdmin.useMutation({
+  const makeAdmin = api.userEdit.makeAdmin.useMutation({
     onSuccess: () => {
       router.refresh();
-      setEmail('');
+      setId('');
     },
   });
 
-  const { data, isLoading } = api.user.checkSession.useQuery(undefined, {
+  const { data, isLoading } = api.auth.checkSession.useQuery(undefined, {
     retry: false,
   });
 
@@ -50,9 +59,13 @@ export function CreateUser() {
           register.mutate({
             firstName: firstName,
             lastName: lastName,
-            currentEmail: email,
+            currentEmail: currentEmail,
             currentPassword: password,
             confirmPassword: confirmPassword,
+            country: country,
+            city: city,
+            zipCode: zipCode,
+            address: address,
           });
         }}
         className='flex flex-col gap-2'
@@ -63,32 +76,32 @@ export function CreateUser() {
           placeholder='fName'
           value={firstName}
           onChange={e => setFirstName(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
           type='text'
           placeholder='lName'
           value={lastName}
           onChange={e => setLastName(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
           type='text'
           placeholder='email'
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          value={currentEmail}
+          onChange={e => setCurrentEmail(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
           type='text'
           placeholder='psw'
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <button
           type='submit'
-          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
+          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
           disabled={login.isPending}
         >
           {register.isPending ? 'Submitting...' : 'Submit'}
@@ -99,7 +112,7 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           login.mutate({
-            currentEmail: email,
+            currentEmail: currentEmail,
             currentPassword: password,
           });
         }}
@@ -114,20 +127,20 @@ export function CreateUser() {
         <input
           type='text'
           placeholder='email'
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          value={currentEmail}
+          onChange={e => setCurrentEmail(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
           type='text'
           placeholder='psw'
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <button
           type='submit'
-          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
+          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
           disabled={login.isPending}
         >
           {login.isPending ? 'Submitting...' : 'Submit'}
@@ -138,8 +151,8 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           makeAdmin.mutate({
-            id: email,
-            key: 'hello'
+            id: id,
+            key: 'hello',
           });
         }}
         className='flex flex-col gap-2'
@@ -148,13 +161,13 @@ export function CreateUser() {
         <input
           type='text'
           placeholder='email'
-          value={email}
-          onChange={e => setEmail(e.target.value)}
-          className='w-full rounded-full px-4 py-2 text-black'
+          value={currentEmail}
+          onChange={e => setCurrentEmail(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
         />
         <button
           type='submit'
-          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
+          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
           disabled={makeAdmin.isPending}
         >
           {makeAdmin.isPending ? 'Submitting...' : 'Submit'}
