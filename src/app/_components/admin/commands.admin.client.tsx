@@ -5,41 +5,45 @@ import { useState, type FocusEventHandler, type ReactNode } from 'react';
 import type { UsersCommandProps } from '../../_types/usersCommand.types';
 import { Button, Input, Label, Loader, api } from '../_index';
 
-const userDetails = {
-  id: '',
-  firstName: '',
-  lastName: '',
-  currentEmail: '',
-  newEmail: '',
-  currentPassword: '',
-  confirmPassword: '',
-  newPassword: '',
-};
-
 // Component to let the admin make actions on the backend from the Admin Command Page
 export function AdminUserCommand({
   actionType,
 }: {
   actionType: UsersCommandProps;
 }) {
+  const userDetails = {
+    id: '',
+    firstName: '',
+    lastName: '',
+    country: '',
+    city: '',
+    zipCode: '',
+    address: '',
+    currentEmail: '',
+    newEmail: '',
+    currentPassword: '',
+    confirmPassword: '',
+    newPassword: '',
+  };
+
   const [user, setUser] = useState(userDetails);
   const router = useRouter();
 
-  const createUser = api.user.createUser.useMutation({
+  const createUser = api.userCreate.createUser.useMutation({
     onSuccess: () => {
       router.refresh();
       setUser({ ...userDetails });
     },
   });
 
-  const removeUser = api.user.removeUser.useMutation({
+  const removeUser = api.userRemove.removeUserAsAdmin.useMutation({
     onSuccess: () => {
       router.refresh();
       setUser({ ...userDetails });
     },
   });
 
-  const editUser = api.user.editUser.useMutation({
+  const editUser = api.userEdit.editUser.useMutation({
     onSuccess: () => {
       router.refresh();
       setUser({ ...userDetails });
@@ -50,7 +54,7 @@ export function AdminUserCommand({
     data: userByEmail,
     isLoading: userByEmailIsLoading,
     refetch: getUserByEmail,
-  } = api.user.getUserByEmail.useQuery(
+  } = api.userGet.getUserByEmail.useQuery(
     {
       currentEmail: user.currentEmail,
     },
@@ -61,7 +65,7 @@ export function AdminUserCommand({
     data: userById,
     isLoading: userByIdIsLoading,
     refetch: getUserById,
-  } = api.user.getUserById.useQuery(
+  } = api.userGet.getUserById.useQuery(
     {
       id: user.id,
     },
@@ -72,7 +76,7 @@ export function AdminUserCommand({
     data: allUsers,
     isLoading: allUsersIsLoading,
     refetch: getAllUsers,
-  } = api.user.getAllUsers.useQuery(undefined, {
+  } = api.userGet.getAllUsers.useQuery(undefined, {
     enabled: false,
     retry: false,
   });
@@ -111,13 +115,17 @@ export function AdminUserCommand({
 
   return (
     <form
-      className='w-3/4 flex flex-col items-center justify-center mx-auto gap-6'
+      className='flex flex-col justify-center items-center gap-6 mx-auto w-3/4'
       onSubmit={async e => {
         e.preventDefault();
         if (actionType === 'create')
           createUser.mutate({
             firstName: user.firstName,
             lastName: user.lastName,
+            country: user.country,
+            city: user.city,
+            zipCode: user.zipCode,
+            address: user.address,
             currentEmail: user.currentEmail,
             currentPassword: user.currentPassword,
             confirmPassword: user.confirmPassword,
@@ -244,7 +252,7 @@ export function LabelAndInput({
 }) {
   return (
     <div className='relative'>
-      <Label className='absolute top-0 left-0' htmlFor={id}>
+      <Label className='top-0 left-0 absolute' htmlFor={id}>
         {children}
       </Label>
       <Input
