@@ -61,11 +61,14 @@ export function generateAuthCookies(
 }
 
 // Function to verify if the IP address has changed
-export function verifyUserIP(userId: string, userIP: string) {
+export function verifyUserIP(
+  userId: string,
+  userIP: string,
+): { isValid: boolean } {
   const token = cookies().get('userIPCookie');
   if (!token) return { isValid: false };
 
-  const userIPData: UserIPProps = JSON.parse(token.value);
+  const userIPData = JSON.parse(token.value) as UserIPProps;
   if (userIPData.userId !== userId) unauthorizedUser(true);
 
   // Hash the current IP address and compare it to the stored IP address
