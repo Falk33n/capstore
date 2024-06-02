@@ -1,8 +1,9 @@
 import bcrypt from 'bcryptjs';
 import { serialize } from 'cookie';
+import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import type { CtxProps, JwtPayloadProp } from '../_types/_index';
+import type { CtxProps, JwtPayloadProp, UserIPProps } from '../_types/_index';
 import { unauthorizedUser, unknownError, unknownUser } from './_index';
 
 // Generate salt and hash for secure passwords
@@ -15,26 +16,69 @@ export async function generateSaltHash(
   return { hashedPassword, salt };
 }
 
-// Function to create a JWT token and serialize it into a cookie
-export function generateAuthCookie(userId: string, resHeaders: Headers) {
+// Function to create a JWT token and serialize it into a auth cookie
+// Also creates a cookie to track changes of the IP address linked to the user
+export function generateAuthCookies(
+  userId: string,
+  userIP: string,
+  resHeaders: Headers,
+) {
   if (!process.env.SECRET_JWT_KEY) unknownError(!process.env.SECRET_JWT_KEY);
 
+  // Create a hashed version of the IP address
+  const hashedIP = crypto.createHash('sha256').update(userIP).digest('hex');
+  const userIPProps: UserIPProps = { userId, hashedIP };
   const token = jwt.sign({ userId }, process.env.SECRET_JWT_KEY, {
-    expiresIn: '2h',
+    expiresIn: '24h',
   });
 
-  // Set the cookie
-  const serializedCookie = serialize('authCookie', token, {
+  // Set the auth cookie
+  const serializedAuthCookie = serialize('authCookie', token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'strict',
-    maxAge: 2 * 60 * 60, // 2 hours in seconds
+    maxAge: 24 * 60 * 60,
     path: '/',
   });
 
-  resHeaders.append('Set-Cookie', serializedCookie);
+  // Set the IP cookie
+  const serializedIPCookie = serialize(
+    'userIPCookie',
+    JSON.stringify(userIPProps),
+    {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 365 * 24 * 60 * 60,
+      path: '/',
+    },
+  );
+
+  resHeaders.append('Set-Cookie', serializedAuthCookie);
+  resHeaders.append('Set-Cookie', serializedIPCookie);
 
   return token;
+}
+
+// Function to verify if the IP address has changed
+export function verifyUserIP(
+  userId: string,
+  userIP: string,
+): { isValid: boolean } {
+  const token = cookies().get('userIPCookie');
+  if (!token) return { isValid: false };
+
+  const userIPData = JSON.parse(token.value) as UserIPProps;
+  if (userIPData.userId !== userId) unauthorizedUser(true);
+
+  // Hash the current IP address and compare it to the stored IP address
+  const hashedCurrentIP = crypto
+    .createHash('sha256')
+    .update(userIP)
+    .digest('hex');
+
+  if (hashedCurrentIP !== userIPData.hashedIP) return { isValid: false };
+  return { isValid: true };
 }
 
 export function findValidAuthCookie(): {
@@ -89,7 +133,7 @@ export async function checkAdminSession({ ctx }: CtxProps) {
 export async function checkSuperAdminSession({ ctx }: CtxProps) {
   const { isValid, id } = await checkSession();
   const user = await ctx.db.user.findUnique({ where: { id: id } });
-  
+
   unknownUser(!user);
   unauthorizedUser(!user?.admin && !user?.superAdmin);
 

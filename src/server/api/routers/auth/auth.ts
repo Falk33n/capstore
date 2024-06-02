@@ -6,7 +6,7 @@ import {
   checkAdminSession,
   checkSession,
   checkSuperAdminSession,
-  generateAuthCookie,
+  generateAuthCookies,
   unknownError,
   unknownUser,
 } from '../_helpers/_index';
@@ -52,7 +52,7 @@ export const authRouter = createTRPCRouter({
           });
 
         // Create and set auth cookie
-        generateAuthCookie(user.id, ctx.resHeaders);
+        generateAuthCookies(user.id, ctx.req.ip!, ctx.resHeaders);
 
         return { message: 'User logged in successfully' };
       } catch (e) {
