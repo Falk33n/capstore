@@ -11,6 +11,10 @@ export const userCreateRouter = createTRPCRouter({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
         currentEmail: z.string().email(),
+        country: z.string().min(1),
+        city: z.string().min(1),
+        zipCode: z.string().min(1),
+        address: z.string().min(1),
         currentPassword: z.string().min(8),
         confirmPassword: z.string().min(8),
       }),
@@ -46,6 +50,10 @@ export const userCreateRouter = createTRPCRouter({
             firstName: input.firstName,
             lastName: input.lastName,
             email: input.currentEmail,
+            country: input.country,
+            city: input.city,
+            zipCode: input.zipCode,
+            address: input.address,
           },
         });
 
