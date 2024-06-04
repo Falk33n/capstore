@@ -52,13 +52,10 @@ export const userRemoveRouter = createTRPCRouter({
 
         unknownUser(!deletedUser);
 
-        const deletedPassword = await ctx.db.password.delete({
-          where: {
-            userId: user?.id,
-          },
-        });
-
-        unknownUser(!deletedPassword);
+        await ctx.db.userPassword.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userAddress.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userRole.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userLog.delete({ where: { userId: deletedUser.id } });
 
         return { message: 'User deleted successfully' };
       } catch (e) {
@@ -80,12 +77,15 @@ export const userRemoveRouter = createTRPCRouter({
         unauthorizedUser(!id || !isValid);
 
         const deletedUser = await ctx.db.user.delete({
-          where: {
-            email: input.currentEmail,
-          },
+          where: { email: input.currentEmail },
         });
 
         unknownUser(!deletedUser);
+
+        await ctx.db.userPassword.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userAddress.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userRole.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userLog.delete({ where: { userId: deletedUser.id } });
 
         return { message: 'User deleted successfully' };
       } catch (e) {
@@ -104,9 +104,12 @@ export const userRemoveRouter = createTRPCRouter({
 
         await checkSuperAdminSession({ ctx: ctx });
         await ctx.db.user.deleteMany();
-        await ctx.db.password.deleteMany();
+        await ctx.db.userPassword.deleteMany();
+        await ctx.db.userAddress.deleteMany();
+        await ctx.db.userRole.deleteMany();
+        await ctx.db.userLog.deleteMany();
 
-        return { message: 'Users and their passwords successfully deleted' };
+        return { message: 'Users successfully deleted' };
       } catch (e) {
         // Handle known errors or rethrow unknown errors
         unknownError(e);
