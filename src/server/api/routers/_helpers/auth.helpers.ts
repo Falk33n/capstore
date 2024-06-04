@@ -95,7 +95,6 @@ export function findValidAuthCookie(): {
   ) as JwtPayloadProp;
 
   unauthorizedUser(!decoded);
-  if (!decoded) return { isValid: false };
 
   return { isValid: true, id: decoded.userId };
 }
@@ -121,21 +120,17 @@ export async function checkSession() {
 // Function to check if a user is authenticated and a admin
 export async function checkAdminSession({ ctx }: CtxProps) {
   const { isValid, id } = await checkSession();
-  const user = await ctx.db.user.findUnique({ where: { id: id } });
-
+  const user = await ctx.db.userRole.findUnique({ where: { userId: id } });
   unknownUser(!user);
   unauthorizedUser(!user?.admin);
-
   return { isValid, id };
 }
 
 // Function to check if a user is authenticated and a super admin
 export async function checkSuperAdminSession({ ctx }: CtxProps) {
   const { isValid, id } = await checkSession();
-  const user = await ctx.db.user.findUnique({ where: { id: id } });
-
+  const user = await ctx.db.userRole.findUnique({ where: { userId: id } });
   unknownUser(!user);
   unauthorizedUser(!user?.admin && !user?.superAdmin);
-
   return { isValid, id };
 }

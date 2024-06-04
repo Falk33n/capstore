@@ -4,6 +4,7 @@ import {
   checkAdminSession,
   checkSession,
   checkSuperAdminSession,
+  generateId,
   unauthorizedUser,
   unknownError,
   unknownUser,
@@ -24,9 +25,7 @@ export const userRemoveRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { isValid, id } = await checkSession();
-        unauthorizedUser(!id || !isValid);
-
+        const { id } = await checkSession();
         const user = await ctx.db.user.findUnique({
           where: {
             id: id,
@@ -34,28 +33,18 @@ export const userRemoveRouter = createTRPCRouter({
         });
 
         unknownUser(!user);
-
-        if (
+        unauthorizedUser(
           input.firstName !== user?.firstName ??
-          input.lastName !== user?.lastName ??
-          input.currentEmail !== user?.email ??
-          input.currentPassword !== input.confirmPassword ??
-          input.safety !== 'I AM SURE'
-        )
-          unauthorizedUser(!id);
+            input.lastName !== user?.lastName ??
+            input.currentEmail !== user?.email ??
+            input.currentPassword !== input.confirmPassword ??
+            input.safety !== 'I AM SURE',
+        );
 
-        const deletedUser = await ctx.db.user.delete({
-          where: {
-            id: user?.id,
-          },
-        });
-
-        unknownUser(!deletedUser);
-
-        await ctx.db.userPassword.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userAddress.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userRole.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userLog.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userRole.delete({ where: { userId: user?.id } });
+        await ctx.db.userAddress.delete({ where: { userId: user?.id } });
+        await ctx.db.userPassword.delete({ where: { userId: user?.id } });
+        await ctx.db.user.delete({ where: { id: user?.id } });
 
         return { message: 'User deleted successfully' };
       } catch (e) {
@@ -73,19 +62,32 @@ export const userRemoveRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { isValid, id } = await checkAdminSession({ ctx: ctx });
-        unauthorizedUser(!id || !isValid);
-
-        const deletedUser = await ctx.db.user.delete({
-          where: { email: input.currentEmail },
+        const user = await ctx.db.user.findUnique({
+          where: {
+            email: input.currentEmail,
+          },
+        });
+        const { id } = await checkAdminSession({ ctx: ctx });
+        const admin = await ctx.db.user.findUnique({
+          where: {
+            id: id,
+          },
         });
 
-        unknownUser(!deletedUser);
+        unknownUser(!user || !admin);
 
-        await ctx.db.userPassword.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userAddress.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userRole.delete({ where: { userId: deletedUser.id } });
-        await ctx.db.userLog.delete({ where: { userId: deletedUser.id } });
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'DELETE USER AS ADMIN',
+            description: `The admin ${admin?.firstName} ${admin?.lastName} deleted the user ${user?.firstName} ${user?.lastName}`,
+          },
+        });
+
+        await ctx.db.userRole.delete({ where: { userId: user?.id } });
+        await ctx.db.userAddress.delete({ where: { userId: user?.id } });
+        await ctx.db.userPassword.delete({ where: { userId: user?.id } });
+        await ctx.db.user.delete({ where: { id: user?.id } });
 
         return { message: 'User deleted successfully' };
       } catch (e) {
@@ -96,21 +98,46 @@ export const userRemoveRouter = createTRPCRouter({
 
   // User router to let super admins remove all users
   removeAllUsers: publicProcedure
-    .input(z.object({ superAdminKey: z.string().min(1) }))
+    .input(
+      z.object({
+        adminKey: z.string().min(1),
+        superAdminKey: z.string().min(1),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       try {
-        if (input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY)
-          unauthorizedUser(true);
+        const { id } = await checkSuperAdminSession({ ctx: ctx });
+        const user = await ctx.db.user.findUnique({ where: { id: id } });
 
-        await checkSuperAdminSession({ ctx: ctx });
-        await ctx.db.user.deleteMany();
-        await ctx.db.userPassword.deleteMany();
-        await ctx.db.userAddress.deleteMany();
+        unknownUser(!user);
+        unauthorizedUser(
+          input.adminKey !== process.env.SECRET_ADMIN_KEY ||
+            input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY,
+        );
+
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'DELETE ALL',
+            description: `The super admin ${user?.firstName} ${user?.lastName} deleted all users`,
+          },
+        });
+
         await ctx.db.userRole.deleteMany();
-        await ctx.db.userLog.deleteMany();
+        await ctx.db.userAddress.deleteMany();
+        await ctx.db.userPassword.deleteMany();
+        await ctx.db.user.deleteMany();
 
         return { message: 'Users successfully deleted' };
       } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED DELETE ALL',
+            description: `Someone tried to delete all users`,
+          },
+        });
+
         // Handle known errors or rethrow unknown errors
         unknownError(e);
       }

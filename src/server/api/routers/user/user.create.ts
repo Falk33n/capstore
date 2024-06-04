@@ -13,7 +13,7 @@ export const userCreateRouter = createTRPCRouter({
         currentEmail: z.string().email(),
         country: z.string().min(1),
         city: z.string().min(1),
-        zipCode: z.string().min(1),
+        postalCode: z.string().min(1),
         address: z.string().min(1),
         currentPassword: z.string().min(8),
         confirmPassword: z.string().min(8),
@@ -50,19 +50,35 @@ export const userCreateRouter = createTRPCRouter({
             firstName: input.firstName,
             lastName: input.lastName,
             email: input.currentEmail,
-            country: input.country,
-            city: input.city,
-            zipCode: input.zipCode,
+          },
+        });
+
+        // Create address entry in the Address table
+        await ctx.db.userAddress.create({
+          data: {
+            id: generateId(),
             address: input.address,
+            city: input.city,
+            country: input.country,
+            postalCode: input.postalCode,
+            userId: createdUser.id,
           },
         });
 
         // Create password entry in the Password table
-        await ctx.db.password.create({
+        await ctx.db.userPassword.create({
           data: {
             id: generateId(),
             salt: salt,
             hashedPassword: hashedPassword,
+            userId: createdUser.id,
+          },
+        });
+
+        // Create role entry in the Role table
+        await ctx.db.userRole.create({
+          data: {
+            id: generateId(),
             userId: createdUser.id,
           },
         });

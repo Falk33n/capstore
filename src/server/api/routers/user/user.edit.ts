@@ -78,7 +78,7 @@ export const userEditRouter = createTRPCRouter({
         if (newPassword) {
           const { hashedPassword, salt } = await generateSaltHash(newPassword);
 
-          await ctx.db.password.update({
+          await ctx.db.userPassword.update({
             where: { userId: updatedUser?.id },
             data: {
               hashedPassword: hashedPassword,
@@ -87,7 +87,7 @@ export const userEditRouter = createTRPCRouter({
           });
         }
 
-        return { user: updatedUser, message: 'User updated successfully' };
+        return { message: 'User updated successfully' };
       } catch (e) {
         // Handle known errors or rethrow unknown errors
         unknownError(e);
@@ -112,8 +112,8 @@ export const userEditRouter = createTRPCRouter({
         unknownUser(!user);
 
         // Update user to a admin
-        const adminUser = await ctx.db.user.update({
-          where: { id: input.id },
+        const adminUser = await ctx.db.userRole.update({
+          where: { userId: input.id },
           data: { admin: true },
         });
 
@@ -136,18 +136,18 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const correctKey =
-          input.adminKey === process.env.SECRET_ADMIN_KEY &&
-          input.superAdminKey === process.env.SECRET_SUPER_ADMIN_KEY;
-        unauthorizedUser(!correctKey);
+        unauthorizedUser(
+          input.adminKey !== process.env.SECRET_ADMIN_KEY ||
+            input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY,
+        );
 
         await checkAdminSession({ ctx: ctx });
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
         unknownUser(!user);
 
         // Update user to a super admin
-        const superAdminUser = await ctx.db.user.update({
-          where: { id: input.id },
+        const superAdminUser = await ctx.db.userRole.update({
+          where: { userId: input.id },
           data: { superAdmin: true },
         });
 

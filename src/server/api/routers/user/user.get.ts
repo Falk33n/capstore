@@ -14,17 +14,16 @@ export const userGetRouter = createTRPCRouter({
       const { id } = await checkSession();
 
       // Fetching all data concurrently using Promise.all
-      const [user, userPassword, userAddress, userRole, userLog] =
+      const [user, userPassword, userAddress, userRole] =
         await Promise.all([
           ctx.db.user.findUnique({ where: { id: id } }),
           ctx.db.userPassword.findUnique({ where: { userId: id } }),
           ctx.db.userAddress.findUnique({ where: { userId: id } }),
           ctx.db.userRole.findUnique({ where: { userId: id } }),
-          ctx.db.userLog.findUnique({ where: { userId: id } }),
         ]);
 
       unknownUser(
-        !user ?? !userPassword ?? !userAddress ?? !userRole ?? !userLog,
+        !user ?? !userPassword ?? !userAddress ?? !userRole,
       );
 
       // Make the api response more readable when returned
@@ -55,12 +54,6 @@ export const userGetRouter = createTRPCRouter({
               }
             : null,
         },
-        userLog: userLog
-          ? {
-              action: userLog.action,
-              createdAt: userLog.createdAt,
-            }
-          : null,
         message: 'User successfully found',
       };
     } catch (e) {
@@ -81,17 +74,16 @@ export const userGetRouter = createTRPCRouter({
         const { id } = await checkAdminSession({ ctx: ctx });
 
         // Fetching all data concurrently using Promise.all
-        const [user, userPassword, userAddress, userRole, userLog] =
+        const [user, userPassword, userAddress, userRole] =
           await Promise.all([
             ctx.db.user.findUnique({ where: { email: input.currentEmail } }),
             ctx.db.userPassword.findUnique({ where: { userId: id } }),
             ctx.db.userAddress.findUnique({ where: { userId: id } }),
             ctx.db.userRole.findUnique({ where: { userId: id } }),
-            ctx.db.userLog.findUnique({ where: { userId: id } }),
           ]);
 
         unknownUser(
-          !user ?? !userPassword ?? !userAddress ?? !userRole ?? !userLog,
+          !user ?? !userPassword ?? !userAddress ?? !userRole,
         );
 
         // Make the api response more readable when returned
@@ -122,12 +114,6 @@ export const userGetRouter = createTRPCRouter({
                 }
               : null,
           },
-          userLog: userLog
-            ? {
-                action: userLog.action,
-                createdAt: userLog.createdAt,
-              }
-            : null,
           message: 'User successfully found',
         };
       } catch (e) {
@@ -148,17 +134,16 @@ export const userGetRouter = createTRPCRouter({
         await checkAdminSession({ ctx: ctx });
 
         // Fetching all data concurrently using Promise.all
-        const [user, userPassword, userAddress, userRole, userLog] =
+        const [user, userPassword, userAddress, userRole] =
           await Promise.all([
             ctx.db.user.findUnique({ where: { id: input.id } }),
             ctx.db.userPassword.findUnique({ where: { userId: input.id } }),
             ctx.db.userAddress.findUnique({ where: { userId: input.id } }),
             ctx.db.userRole.findUnique({ where: { userId: input.id } }),
-            ctx.db.userLog.findUnique({ where: { userId: input.id } }),
           ]);
 
         unknownUser(
-          !user ?? !userPassword ?? !userAddress ?? !userRole ?? !userLog,
+          !user ?? !userPassword ?? !userAddress ?? !userRole,
         );
 
         // Make the api response more readable when returned
@@ -189,12 +174,6 @@ export const userGetRouter = createTRPCRouter({
                 }
               : null,
           },
-          userLog: userLog
-            ? {
-                action: userLog.action,
-                createdAt: userLog.createdAt,
-              }
-            : null,
           message: 'User successfully found',
         };
       } catch (e) {
@@ -209,13 +188,12 @@ export const userGetRouter = createTRPCRouter({
       await checkAdminSession({ ctx: ctx });
 
       // Fetching all data concurrently using Promise.all
-      const [users, userPasswords, userAddresses, userRoles, userLogs] =
+      const [users, userPasswords, userAddresses, userRoles] =
         await Promise.all([
           ctx.db.user.findMany(),
           ctx.db.userPassword.findMany(),
           ctx.db.userAddress.findMany(),
           ctx.db.userRole.findMany(),
-          ctx.db.userLog.findMany(),
         ]);
 
       // Mapping data to respective users
@@ -223,13 +201,10 @@ export const userGetRouter = createTRPCRouter({
         const userPassword = userPasswords.find(
           password => password.userId === user.id,
         );
-
         const userAddress = userAddresses.find(
           address => address.userId === user.id,
         );
-
         const userRole = userRoles.find(role => role.userId === user.id);
-        const userLog = userLogs.find(log => log.userId === user.id);
 
         // Make the api response more readable when returned
         return {
@@ -259,12 +234,6 @@ export const userGetRouter = createTRPCRouter({
                 }
               : null,
           },
-          userLog: userLog
-            ? {
-                action: userLog.action,
-                createdAt: userLog.createdAt,
-              }
-            : null,
           message: 'Users successfully found',
         };
       });
