@@ -19,7 +19,6 @@ model User {
     role            UserRole?
     password        UserPassword?
     address         UserAddress?
-    logs            UserLog[]
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
 }
@@ -40,7 +39,7 @@ model UserAddress {
     id              String      @unique    @id 
     country         String
     city            String
-    zipCode         String
+    postalCode      String
     address         String 
     user            User        @relation(fields: [userId], references: [id])
     userId          String      @unique
@@ -63,7 +62,6 @@ model UserRole {
 model UserLog {
     id              String      @unique    @id 
     action          String
-    user            User        @relation(fields: [userId], references: [id])
-    userId          String      @unique
+    description     String
     createdAt       DateTime    @default(now())
 }
