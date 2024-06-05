@@ -11,50 +11,55 @@ import {
 } from '../_helpers/_index';
 
 export const userRemoveRouter = createTRPCRouter({
-  // User router to let users remove their own accounts
   removeUser: publicProcedure
     .input(
       z.object({
         firstName: z.string().min(1),
         lastName: z.string().min(1),
-        currentEmail: z.string().email(),
-        currentPassword: z.string().min(8),
+        email: z.string().email(),
+        password: z.string().min(8),
         confirmPassword: z.string().min(8),
-        safety: z.string().min(1),
+        safetySentence: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
         const { id } = await checkSession();
+
         const user = await ctx.db.user.findUnique({
           where: {
             id: id,
           },
         });
 
-        unknownUser(!user);
-        unauthorizedUser(
-          input.firstName !== user?.firstName ??
-            input.lastName !== user?.lastName ??
-            input.currentEmail !== user?.email ??
-            input.currentPassword !== input.confirmPassword ??
-            input.safety !== 'I AM SURE',
-        );
+        const validInput =
+          input.firstName === user?.firstName &&
+          input.lastName === user?.lastName &&
+          input.email === user?.email &&
+          input.password === input.confirmPassword &&
+          input.safetySentence === 'I AM SURE';
+        const validData = id && user && validInput;
 
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'DELETE USER',
-            description: `The former user ${user?.firstName} ${user?.lastName} deleted their account`,
-          },
-        });
+        if (validData) {
+          await ctx.db.userLog.create({
+            data: {
+              id: generateId(),
+              action: 'DELETE USER',
+              description: `The former user ${user.firstName} ${user.lastName} deleted their account`,
+            },
+          });
 
-        await ctx.db.userRole.delete({ where: { userId: user?.id } });
-        await ctx.db.userAddress.delete({ where: { userId: user?.id } });
-        await ctx.db.userPassword.delete({ where: { userId: user?.id } });
-        await ctx.db.user.delete({ where: { id: user?.id } });
+          await ctx.db.userRole.delete({ where: { userId: user.id } });
+          await ctx.db.userAddress.delete({ where: { userId: user.id } });
+          await ctx.db.userPassword.delete({ where: { userId: user.id } });
+          await ctx.db.user.delete({ where: { id: user.id } });
+        }
 
-        return 'User deleted successfully';
+        if (!user) {
+          unknownUser();
+        } else if (!id) {
+          unauthorizedUser();
+        }
       } catch (e) {
         await ctx.db.userLog.create({
           data: {
@@ -64,16 +69,14 @@ export const userRemoveRouter = createTRPCRouter({
           },
         });
 
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 
-  // User router to let admins remove users
   removeUserAsAdmin: publicProcedure
     .input(
       z.object({
-        currentEmail: z.string().email(),
+        email: z.string().email(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -82,7 +85,7 @@ export const userRemoveRouter = createTRPCRouter({
 
         const user = await ctx.db.user.findUnique({
           where: {
-            email: input.currentEmail,
+            email: input.email,
           },
         });
         const admin = await ctx.db.user.findUnique({
@@ -91,22 +94,30 @@ export const userRemoveRouter = createTRPCRouter({
           },
         });
 
-        unknownUser(!user || !admin);
+        const validData = user && admin && id;
 
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'DELETE USER AS ADMIN',
-            description: `The admin ${admin?.firstName} ${admin?.lastName} deleted the user ${user?.firstName} ${user?.lastName}`,
-          },
-        });
+        if (validData) {
+          await ctx.db.userLog.create({
+            data: {
+              id: generateId(),
+              action: 'DELETE USER AS ADMIN',
+              description: `The admin ${admin.firstName} ${admin.lastName} deleted the user ${user.firstName} ${user.lastName}`,
+            },
+          });
 
-        await ctx.db.userRole.delete({ where: { userId: user?.id } });
-        await ctx.db.userAddress.delete({ where: { userId: user?.id } });
-        await ctx.db.userPassword.delete({ where: { userId: user?.id } });
-        await ctx.db.user.delete({ where: { id: user?.id } });
+          await ctx.db.userRole.delete({ where: { userId: user.id } });
+          await ctx.db.userAddress.delete({ where: { userId: user.id } });
+          await ctx.db.userPassword.delete({ where: { userId: user.id } });
+          await ctx.db.user.delete({ where: { id: user.id } });
 
-        return 'User deleted successfully';
+          return;
+        }
+
+        if (!id) {
+          unauthorizedUser();
+        } else if (!validData) {
+          unknownUser();
+        }
       } catch (e) {
         await ctx.db.userLog.create({
           data: {
@@ -116,12 +127,10 @@ export const userRemoveRouter = createTRPCRouter({
           },
         });
 
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 
-  // User router to let super admins remove all users
   removeAllUsers: publicProcedure
     .input(
       z.object({
@@ -132,28 +141,34 @@ export const userRemoveRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       try {
         const { id } = await checkSuperAdminSession({ ctx: ctx });
-        const user = await ctx.db.user.findUnique({ where: { id: id } });
 
-        unknownUser(!user);
-        unauthorizedUser(
-          input.adminKey !== process.env.SECRET_ADMIN_KEY ||
-            input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY,
-        );
+        const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
 
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'DELETE ALL',
-            description: `The super admin ${user?.firstName} ${user?.lastName} deleted all users`,
-          },
-        });
+        const validKeys =
+          input.adminKey === process.env.SECRET_ADMIN_KEY &&
+          input.superAdminKey === process.env.SECRET_SUPER_ADMIN_KEY;
+        const validData = id && validKeys && superAdmin;
 
-        await ctx.db.userRole.deleteMany();
-        await ctx.db.userAddress.deleteMany();
-        await ctx.db.userPassword.deleteMany();
-        await ctx.db.user.deleteMany();
+        if (validData) {
+          await ctx.db.userLog.create({
+            data: {
+              id: generateId(),
+              action: 'DELETE ALL',
+              description: `The super admin ${superAdmin.firstName} ${superAdmin.lastName} deleted all users`,
+            },
+          });
 
-        return 'Users successfully deleted';
+          await ctx.db.userRole.deleteMany();
+          await ctx.db.userAddress.deleteMany();
+          await ctx.db.userPassword.deleteMany();
+          await ctx.db.user.deleteMany();
+        }
+
+        if (!superAdmin) {
+          unknownUser();
+        } else if (!validData) {
+          unauthorizedUser();
+        }
       } catch (e) {
         await ctx.db.userLog.create({
           data: {
@@ -163,8 +178,7 @@ export const userRemoveRouter = createTRPCRouter({
           },
         });
 
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 });
