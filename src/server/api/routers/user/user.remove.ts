@@ -41,13 +41,29 @@ export const userRemoveRouter = createTRPCRouter({
             input.safety !== 'I AM SURE',
         );
 
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'DELETE USER',
+            description: `The former user ${user?.firstName} ${user?.lastName} deleted their account`,
+          },
+        });
+
         await ctx.db.userRole.delete({ where: { userId: user?.id } });
         await ctx.db.userAddress.delete({ where: { userId: user?.id } });
         await ctx.db.userPassword.delete({ where: { userId: user?.id } });
         await ctx.db.user.delete({ where: { id: user?.id } });
 
-        return { message: 'User deleted successfully' };
+        return 'User deleted successfully';
       } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED DELETE USER',
+            description: 'Someone tried to delete their account',
+          },
+        });
+
         // Handle known errors or rethrow unknown errors
         unknownError(e);
       }
@@ -62,12 +78,13 @@ export const userRemoveRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
+        const { id } = await checkAdminSession({ ctx: ctx });
+
         const user = await ctx.db.user.findUnique({
           where: {
             email: input.currentEmail,
           },
         });
-        const { id } = await checkAdminSession({ ctx: ctx });
         const admin = await ctx.db.user.findUnique({
           where: {
             id: id,
@@ -89,8 +106,16 @@ export const userRemoveRouter = createTRPCRouter({
         await ctx.db.userPassword.delete({ where: { userId: user?.id } });
         await ctx.db.user.delete({ where: { id: user?.id } });
 
-        return { message: 'User deleted successfully' };
+        return 'User deleted successfully';
       } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED DELETE USER AS ADMIN',
+            description: 'Someone tried to delete a user',
+          },
+        });
+
         // Handle known errors or rethrow unknown errors
         unknownError(e);
       }
@@ -128,13 +153,13 @@ export const userRemoveRouter = createTRPCRouter({
         await ctx.db.userPassword.deleteMany();
         await ctx.db.user.deleteMany();
 
-        return { message: 'Users successfully deleted' };
+        return 'Users successfully deleted';
       } catch (e) {
         await ctx.db.userLog.create({
           data: {
             id: generateId(),
             action: 'FAILED DELETE ALL',
-            description: `Someone tried to delete all users`,
+            description: 'Someone tried to delete all users',
           },
         });
 
