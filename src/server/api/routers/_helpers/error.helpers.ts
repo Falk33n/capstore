@@ -1,7 +1,5 @@
 import { TRPCError } from '@trpc/server';
 
-// Functions to handle errors
-
 export const unknownError = () => {
   throw new TRPCError({
     code: 'INTERNAL_SERVER_ERROR',
