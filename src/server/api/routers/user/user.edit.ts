@@ -5,6 +5,8 @@ import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
   checkAdminSession,
   checkSession,
+  checkSuperAdminSession,
+  generateId,
   generateSaltHash,
   unauthorizedUser,
   unknownError,
@@ -12,89 +14,139 @@ import {
 } from '../_helpers/_index';
 
 export const userEditRouter = createTRPCRouter({
-  // Router to edit a user
   editUser: publicProcedure
     .input(
       z.object({
         firstName: z.string().min(1).optional(),
         lastName: z.string().min(1).optional(),
-        currentEmail: z.string().email(),
+        address: z.string().min(1).optional(),
+        postalCode: z.string().min(1).optional(),
+        country: z.string().min(1).optional(),
+        city: z.string().min(1).optional(),
         newEmail: z.string().email().optional(),
-        currentPassword: z.string().min(8),
+        password: z.string().min(8),
         confirmPassword: z.string().min(8),
         newPassword: z.string().min(8).optional(),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        await checkSession();
+        const { id } = await checkSession();
 
         const {
-          currentEmail,
           firstName,
           lastName,
+          address,
+          postalCode,
+          country,
+          city,
           newEmail,
-          currentPassword,
+          password,
           newPassword,
           confirmPassword,
         } = input;
-        const updateData: Prisma.UserUpdateInput = {};
+        const updateUser: Prisma.UserUpdateInput = {};
+        const updateAddress: Prisma.UserAddressUpdateInput = {};
 
-        if (firstName) updateData.firstName = firstName;
-        if (lastName) updateData.lastName = lastName;
-        if (newEmail) updateData.email = newEmail;
+        const validUserData = Object.keys(updateUser).length > 0;
+        const validAddressData = Object.keys(updateAddress).length > 0;
+        const validUpdateData = validUserData || validAddressData;
+        const validPasswordData =
+          (password && confirmPassword && password === confirmPassword) ??
+          (password &&
+            newPassword &&
+            confirmPassword &&
+            newPassword === confirmPassword);
 
-        // If no update data is provided, throw an error
-        if (Object.keys(updateData).length === 0) {
+        if (firstName) {
+          updateUser.firstName = firstName;
+        }
+        if (lastName) {
+          updateUser.lastName = lastName;
+        }
+        if (newEmail) {
+          updateUser.email = newEmail;
+        }
+        if (address) {
+          updateAddress.address = address;
+        }
+        if (postalCode) {
+          updateAddress.postalCode = postalCode;
+        }
+        if (country) {
+          updateAddress.country = country;
+        }
+        if (city) {
+          updateAddress.city = city;
+        }
+
+        if (!validUpdateData) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
             message: 'No updates provided',
           });
-        }
-
-        // Check if password update is needed and if the passwords match
-        if (
-          !currentPassword ||
-          newPassword !== confirmPassword ||
-          currentPassword !== confirmPassword
-        )
+        } else if (!validPasswordData) {
           throw new TRPCError({
             code: 'BAD_REQUEST',
-            message: 'Passwords do not match or current password is missing',
+            message: 'Passwords do not match or password is missing',
           });
-
-        // Update user in the database if there is data to update
-        let updatedUser;
-        if (Object.keys(updateData).length > 0) {
-          updatedUser = await ctx.db.user.update({
-            where: { email: currentEmail },
-            data: updateData,
-          });
-
-          unknownUser(!updatedUser);
         }
 
-        // If password is provided, update the Password table
-        if (newPassword) {
-          const { hashedPassword, salt } = await generateSaltHash(newPassword);
+        if (validUserData) {
+          const updatedUser = await ctx.db.user.update({
+            where: { id: id },
+            data: updateUser,
+          });
 
-          await ctx.db.userPassword.update({
-            where: { userId: updatedUser?.id },
+          await ctx.db.userLog.create({
             data: {
-              hashedPassword: hashedPassword,
-              salt: salt,
+              id: generateId(),
+              action: 'EDIT USER',
+              description: `The user ${updatedUser.firstName} ${updatedUser.lastName} edited their account`,
             },
           });
-        }
 
-        return { message: 'User updated successfully' };
+          if (!updatedUser) {
+            unknownUser();
+          }
+        }
+        if (validAddressData) {
+          const updatedAddress = await ctx.db.userAddress.update({
+            where: { id: id },
+            data: updateAddress,
+          });
+
+          if (!updatedAddress) {
+            unknownUser();
+          }
+        }
+        if (newPassword) {
+          const { hashedPassword, salt } = await generateSaltHash(newPassword);
+          const validPassword = hashedPassword && salt;
+
+          if (validPassword) {
+            await ctx.db.userPassword.update({
+              where: { userId: id },
+              data: {
+                hashedPassword: hashedPassword,
+                salt: salt,
+              },
+            });
+          }
+        }
       } catch (e) {
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED EDIT USER',
+            description: 'Someone tried to edit a user',
+          },
+        });
+
+        unknownError();
       }
     }),
 
-  // Router to make a user a admin
   makeAdmin: publicProcedure
     .input(
       z.object({
@@ -104,28 +156,47 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const correctKey = input.key === process.env.SECRET_ADMIN_KEY;
-        unauthorizedUser(!correctKey);
+        const { id } = await checkAdminSession({ ctx: ctx });
 
-        await checkAdminSession({ ctx: ctx });
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-        unknownUser(!user);
+        const admin = await ctx.db.user.findUnique({ where: { id: id } });
 
-        // Update user to a admin
-        const adminUser = await ctx.db.userRole.update({
-          where: { userId: input.id },
-          data: { admin: true },
+        const validData =
+          input.key === process.env.SECRET_ADMIN_KEY && id && user && admin;
+
+        if (validData) {
+          await ctx.db.userLog.create({
+            data: {
+              id: generateId(),
+              action: 'MAKE USER ADMIN',
+              description: `The user ${user.firstName} ${user.lastName} was made an admin by the admin ${admin.firstName} ${admin.lastName}`,
+            },
+          });
+
+          await ctx.db.userRole.update({
+            where: { userId: user.id },
+            data: { admin: true },
+          });
+        }
+
+        if (!user) {
+          unknownUser();
+        } else if (!validData) {
+          unauthorizedUser();
+        }
+      } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED MAKE USER ADMIN',
+            description: 'Someone tried to make a user an admin',
+          },
         });
 
-        unknownUser(!adminUser);
-        return { message: 'User updated successfully' };
-      } catch (e) {
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 
-  // Router to make a admin a super admin
   makeSuperAdmin: publicProcedure
     .input(
       z.object({
@@ -136,26 +207,48 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        unauthorizedUser(
-          input.adminKey !== process.env.SECRET_ADMIN_KEY ||
-            input.superAdminKey !== process.env.SECRET_SUPER_ADMIN_KEY,
-        );
+        const { id } = await checkSuperAdminSession({ ctx: ctx });
 
-        await checkAdminSession({ ctx: ctx });
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-        unknownUser(!user);
+        const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
 
-        // Update user to a super admin
-        const superAdminUser = await ctx.db.userRole.update({
-          where: { userId: input.id },
-          data: { superAdmin: true },
+        const validData =
+          input.adminKey === process.env.SECRET_ADMIN_KEY &&
+          input.superAdminKey === process.env.SECRET_SUPER_ADMIN_KEY &&
+          id &&
+          user &&
+          superAdmin;
+
+        if (validData) {
+          await ctx.db.userLog.create({
+            data: {
+              id: generateId(),
+              action: 'MAKE USER SUPER ADMIN',
+              description: `The user ${user.firstName} ${user.lastName} was made an super admin by the super admin ${superAdmin.firstName} ${superAdmin.lastName}`,
+            },
+          });
+
+          await ctx.db.userRole.update({
+            where: { userId: user.id },
+            data: { superAdmin: true },
+          });
+        }
+
+        if (!user) {
+          unknownUser();
+        } else if (!validData) {
+          unauthorizedUser();
+        }
+      } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED MAKE USER SUPER ADMIN',
+            description: 'Someone tried to make a user an super admin',
+          },
         });
 
-        unknownUser(!superAdminUser);
-        return { message: 'User updated successfully' };
-      } catch (e) {
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 });

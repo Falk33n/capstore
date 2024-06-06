@@ -7,96 +7,186 @@ import {
   checkSession,
   checkSuperAdminSession,
   generateAuthCookies,
+  generateId,
+  unauthorizedUser,
   unknownError,
   unknownUser,
 } from '../_helpers/_index';
 
 export const authRouter = createTRPCRouter({
-  // User router to login a user
   loginUser: publicProcedure
     .input(
       z.object({
-        currentEmail: z.string().email(),
-        currentPassword: z.string().min(8),
+        email: z.string().email(),
+        password: z.string().min(8),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        // Find user by email and include the password relation
         const user = await ctx.db.user.findUnique({
-          where: { email: input.currentEmail },
-          include: {
-            password: true,
+          where: { email: input.email },
+        });
+
+        if (user) {
+          const userPassword = await ctx.db.userPassword.findUnique({
+            where: { userId: user.id },
+          });
+
+          if (userPassword) {
+            const validPassword = await authenticatePassword(
+              input.password,
+              userPassword.hashedPassword,
+              userPassword.salt,
+            );
+
+            if (!validPassword) {
+              throw new TRPCError({
+                code: 'BAD_REQUEST',
+                message: 'Invalid password',
+              });
+            }
+
+            await ctx.db.userLog.create({
+              data: {
+                id: generateId(),
+                action: 'LOGIN USER',
+                description: `The user ${user.firstName} ${user.lastName} logged in`,
+              },
+            });
+
+            if (ctx.req.ip) {
+              generateAuthCookies(user.id, ctx.req.ip, ctx.resHeaders);
+            }
+          }
+        }
+
+        if (!user) {
+          unknownUser();
+        }
+      } catch (e) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'FAILED LOGIN',
+            description: 'Someone tried to login to the site',
           },
         });
 
-        unknownUser(!user);
-
-        if (!user?.password)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Password was not provided',
-          });
-
-        // Verify password
-        const isPasswordValid = await authenticatePassword(
-          input.currentPassword,
-          user.password.hashedPassword,
-          user.password.salt,
-        );
-
-        if (!isPasswordValid)
-          throw new TRPCError({
-            code: 'BAD_REQUEST',
-            message: 'Invalid password',
-          });
-
-        // Create and set auth cookie
-        generateAuthCookies(user.id, ctx.req.ip!, ctx.resHeaders);
-
-        return { message: 'User logged in successfully' };
-      } catch (e) {
-        // Handle known errors or rethrow unknown errors
-        unknownError(e);
+        unknownError();
       }
     }),
 
-  // User router to check if a user is logged in via the auth cookie
-  checkSession: publicProcedure.query(async () => {
+  checkSession: publicProcedure.query(async ({ ctx }) => {
     try {
-      return {
-        isValid: (await checkSession()).isValid,
-        message: 'User is authenticated',
-      };
+      const { isValid, id } = await checkSession();
+
+      const user = await ctx.db.user.findUnique({ where: { id: id } });
+
+      const validData = isValid && id && user;
+
+      if (validData) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'CHECK SESSION',
+            description: `The user ${user.firstName} ${user.lastName} was authenticated`,
+          },
+        });
+
+        return true;
+      }
+
+      if (!user) {
+        unknownUser();
+      } else if (!isValid) {
+        unauthorizedUser();
+      }
     } catch (e) {
-      // Handle known errors or rethrow unknown errors
-      unknownError(e);
+      await ctx.db.userLog.create({
+        data: {
+          id: generateId(),
+          action: 'FAILED CHECK SESSION',
+          description: 'Someone failed authentication',
+        },
+      });
+
+      unknownError();
     }
   }),
 
-  // User router to check if a user is logged in via the auth cookie and a admin
   checkAdminSession: publicProcedure.query(async ({ ctx }) => {
     try {
-      return {
-        isValid: (await checkAdminSession({ ctx: ctx })).isValid,
-        message: 'Admin is authenticated',
-      };
+      const { isValid, id } = await checkAdminSession({ ctx: ctx });
+
+      const admin = await ctx.db.user.findUnique({ where: { id: id } });
+
+      const validData = isValid && id && admin;
+
+      if (validData) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'CHECK ADMIN SESSION',
+            description: `The admin ${admin.firstName} ${admin.lastName} was authenticated`,
+          },
+        });
+
+        return true;
+      }
+
+      if (!admin) {
+        unknownUser();
+      } else if (!isValid) {
+        unauthorizedUser();
+      }
     } catch (e) {
-      // Handle known errors or rethrow unknown errors
-      unknownError(e);
+      await ctx.db.userLog.create({
+        data: {
+          id: generateId(),
+          action: 'FAILED CHECK ADMIN SESSION',
+          description: 'Someone failed admin authentication',
+        },
+      });
+
+      unknownError();
     }
   }),
 
-  // User router to check if a user is logged in via the auth cookie and a super admin
   checkSuperAdminSession: publicProcedure.query(async ({ ctx }) => {
     try {
-      return {
-        isValid: (await checkSuperAdminSession({ ctx: ctx })).isValid,
-        message: 'Super Admin is authenticated',
-      };
+      const { isValid, id } = await checkSuperAdminSession({ ctx: ctx });
+
+      const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
+
+      const validData = isValid && id && superAdmin;
+
+      if (validData) {
+        await ctx.db.userLog.create({
+          data: {
+            id: generateId(),
+            action: 'CHECK SUPER ADMIN SESSION',
+            description: `The superAdmin ${superAdmin.firstName} ${superAdmin.lastName} was authenticated`,
+          },
+        });
+
+        return true;
+      }
+
+      if (!superAdmin) {
+        unknownUser();
+      } else if (!isValid) {
+        unauthorizedUser();
+      }
     } catch (e) {
-      // Handle known errors or rethrow unknown errors
-      unknownError(e);
+      await ctx.db.userLog.create({
+        data: {
+          id: generateId(),
+          action: 'FAILED CHECK SUPER ADMIN SESSION',
+          description: 'Someone failed super admin authentication',
+        },
+      });
+
+      unknownError();
     }
   }),
 });

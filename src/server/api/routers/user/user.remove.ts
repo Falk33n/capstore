@@ -153,7 +153,7 @@ export const userRemoveRouter = createTRPCRouter({
           await ctx.db.userLog.create({
             data: {
               id: generateId(),
-              action: 'DELETE ALL',
+              action: 'DELETE ALL USERS',
               description: `The super admin ${superAdmin.firstName} ${superAdmin.lastName} deleted all users`,
             },
           });

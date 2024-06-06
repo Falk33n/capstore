@@ -26,7 +26,7 @@ export const userGetRouter = createTRPCRouter({
         await ctx.db.userLog.create({
           data: {
             id: generateId(),
-            action: 'GET CURRENT',
+            action: 'GET CURRENT USER',
             description: `The user ${user.firstName} ${user.lastName} retrieved their details`,
           },
         });
@@ -52,7 +52,7 @@ export const userGetRouter = createTRPCRouter({
       await ctx.db.userLog.create({
         data: {
           id: generateId(),
-          action: 'FAILED GET CURRENT',
+          action: 'FAILED GET CURRENT USER',
           description: 'Someone tried to retrieve the current user',
         },
       });
@@ -88,7 +88,7 @@ export const userGetRouter = createTRPCRouter({
           await ctx.db.userLog.create({
             data: {
               id: generateId(),
-              action: 'GET BY EMAIL',
+              action: 'GET USER BY EMAIL',
               description: `The admin ${admin.firstName} ${admin.lastName} retrieved the user ${user.firstName} ${user.lastName} by email`,
             },
           });
@@ -116,7 +116,7 @@ export const userGetRouter = createTRPCRouter({
         await ctx.db.userLog.create({
           data: {
             id: generateId(),
-            action: 'FAILED GET BY EMAIL',
+            action: 'FAILED GET USER BY EMAIL',
             description: 'Someone tried to retrieve a user by email',
           },
         });
@@ -152,7 +152,7 @@ export const userGetRouter = createTRPCRouter({
           await ctx.db.userLog.create({
             data: {
               id: generateId(),
-              action: 'GET BY ID',
+              action: 'GET USER BY ID',
               description: `The admin ${admin.firstName} ${admin.lastName} retrieved the user ${user.firstName} ${user.lastName} by ID`,
             },
           });
@@ -180,7 +180,7 @@ export const userGetRouter = createTRPCRouter({
         await ctx.db.userLog.create({
           data: {
             id: generateId(),
-            action: 'FAILED GET BY ID',
+            action: 'FAILED GET USER BY ID',
             description: 'Someone tried to retrieve a user by ID',
           },
         });
@@ -232,7 +232,7 @@ export const userGetRouter = createTRPCRouter({
         await ctx.db.userLog.create({
           data: {
             id: generateId(),
-            action: 'GET ALL',
+            action: 'GET ALL USERS',
             description: `The admin ${admin.firstName} ${admin.lastName} retrieved all users`,
           },
         });
@@ -247,7 +247,7 @@ export const userGetRouter = createTRPCRouter({
       await ctx.db.userLog.create({
         data: {
           id: generateId(),
-          action: 'FAILED GET ALL',
+          action: 'FAILED GET ALL USERS',
           description: 'Someone tried to retrieve all users',
         },
       });
