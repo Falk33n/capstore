@@ -13,7 +13,7 @@ export function AdminHeader() {
       {isLoading ? (
         <Loader />
       ) : (
-        `Welcome back ${data?.user ? data.user.firstName : 'to the Admin Dashboard'}!`
+        `Welcome back ${data ? data.firstName : 'to the Admin Dashboard'}!`
       )}
     </h1>
   );

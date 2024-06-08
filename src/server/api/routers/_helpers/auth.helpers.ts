@@ -3,7 +3,9 @@ import { serialize } from 'cookie';
 import crypto from 'crypto';
 import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
-import type { CtxProps, JwtPayloadProp, UserIPProps } from '../_types/_index';
+import type { NextRequest } from 'next/server';
+import requestIp from 'request-ip';
+import type { CtxProps, JwtPayloadProp, UserIpProps } from '../_types/_index';
 import { unauthorizedUser, unknownError, unknownUser } from './_index';
 
 export async function generateSaltHash(
@@ -22,52 +24,69 @@ export async function generateSaltHash(
   }
 }
 
+function convertRequest(req: NextRequest): requestIp.Request {
+  const headers: Record<string, string> = {};
+  req.headers.forEach((value, key) => {
+    headers[key] = value;
+  });
+
+  return {
+    headers: headers,
+    method: req.method,
+    url: req.url,
+    body: req.body,
+  } as unknown as requestIp.Request;
+}
+
 export function generateAuthCookies(
   userId: string,
-  userIP: string,
+  req: NextRequest,
   resHeaders: Headers,
 ) {
   if (process.env.SECRET_JWT_KEY) {
-    const hashedIP = crypto.createHash('sha256').update(userIP).digest('hex');
-    const userIPProps: UserIPProps = { userId, hashedIP };
-    const token = jwt.sign({ userId }, process.env.SECRET_JWT_KEY, {
-      expiresIn: '24h',
-    });
+    const clientIp = requestIp.getClientIp(convertRequest(req));
 
-    const serializedAuthCookie = serialize('pkajgokfdarqq', token, {
-      // Unrecognizable name of cookie for security reasons
-      httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
-      maxAge: 24 * 60 * 60, // 24 hours
-      path: '/',
-    });
+    if (clientIp) {
+      const hashedIp = crypto
+        .createHash('sha256')
+        .update(clientIp)
+        .digest('hex');
+      const userIpProps: UserIpProps = { userId: userId, hashedIp: hashedIp };
+      const token = jwt.sign({ userId }, process.env.SECRET_JWT_KEY, {
+        expiresIn: '24h',
+      });
 
-    const serializedIPCookie = serialize(
-      'tkiflocdsyywsas',
-      JSON.stringify(userIPProps),
-      {
+      const serializedAuthCookie = serialize('pkajgokfdarqq', token, {
         // Unrecognizable name of cookie for security reasons
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: 'strict',
-        maxAge: 365 * 24 * 60 * 60, // 1 year
+        maxAge: 24 * 60 * 60, // 24 hours
         path: '/',
-      },
-    );
+      });
 
-    const validData =
-      hashedIP &&
-      userIPProps &&
-      token &&
-      serializedAuthCookie &&
-      serializedIPCookie;
+      const serializedIpCookie = serialize(
+        'tkiflocdsyywsas',
+        JSON.stringify(userIpProps),
+        {
+          // Unrecognizable name of cookie for security reasons
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production',
+          sameSite: 'strict',
+          maxAge: 365 * 24 * 60 * 60, // 1 year
+          path: '/',
+        },
+      );
 
-    if (validData) {
-      resHeaders.append('Set-Cookie', serializedAuthCookie);
-      resHeaders.append('Set-Cookie', serializedIPCookie);
+      const validData =
+        userIpProps && token && serializedAuthCookie && serializedIpCookie;
 
-      return token;
+      if (validData) {
+        resHeaders.append('Set-Cookie', serializedAuthCookie);
+        resHeaders.append('Set-Cookie', serializedIpCookie);
+
+        return;
+      }
     }
   }
 
@@ -78,15 +97,15 @@ export function verifyUserIP(userId: string, userIP: string): boolean {
   const token = cookies().get('tkiflocdsyywsas');
 
   if (token) {
-    const userIPData = JSON.parse(token.value) as UserIPProps;
+    const userIpData = JSON.parse(token.value) as UserIpProps;
 
-    const hashedCurrentIP = crypto
+    const hashedCurrentIp = crypto
       .createHash('sha256')
       .update(userIP)
       .digest('hex');
 
     const validData =
-      userIPData.userId === userId && hashedCurrentIP === userIPData.hashedIP;
+      userIpData.userId === userId && hashedCurrentIp === userIpData.hashedIp;
 
     if (!validData) {
       unauthorizedUser();

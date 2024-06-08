@@ -15,7 +15,7 @@ export const useAuth = ({
 
   useEffect(() => {
     if (isLoading) return;
-    if (!data?.isValid) {
+    if (!data) {
       router.push('/');
       toast({
         variant: 'destructive',
