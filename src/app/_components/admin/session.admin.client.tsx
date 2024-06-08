@@ -20,7 +20,7 @@ export function AdminSession({ children }: { children: ReactNode }) {
 
   // Render different elements based on if the user is a authenticated admin or not
   if (isLoading) return <PageSkeleton />;
-  if (!isLoading && data?.isValid)
+  if (!isLoading && data)
     return (
       <div className='flex justify-center items-center bg-card w-full'>
         {children}

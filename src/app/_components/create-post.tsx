@@ -10,11 +10,10 @@ export function CreateUser() {
   const [lastName, setLastName] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [currentEmail, setCurrentEmail] = useState('');
-  const [id, setId] = useState('');
+  const [email, setEmail] = useState('');
   const [country, setCountry] = useState('');
   const [city, setCity] = useState('');
-  const [zipCode, setZipCode] = useState('');
+  const [postalCode, setPostalCode] = useState('');
   const [address, setAddress] = useState('');
 
   const register = api.userCreate.createUser.useMutation({
@@ -22,12 +21,12 @@ export function CreateUser() {
       router.refresh();
       setFirstName('');
       setLastName('');
-      setCurrentEmail('');
+      setEmail('');
       setPassword('');
       setConfirmPassword('');
       setCountry('');
       setCity('');
-      setZipCode('');
+      setPostalCode('');
       setAddress('');
     },
   });
@@ -35,7 +34,7 @@ export function CreateUser() {
   const login = api.auth.loginUser.useMutation({
     onSuccess: () => {
       router.refresh();
-      setCurrentEmail('');
+      setEmail('');
       setPassword('');
     },
   });
@@ -43,7 +42,12 @@ export function CreateUser() {
   const makeAdmin = api.userEdit.makeAdmin.useMutation({
     onSuccess: () => {
       router.refresh();
-      setId('');
+    },
+  });
+
+  const makeSuperAdmin = api.userEdit.makeSuperAdmin.useMutation({
+    onSuccess: () => {
+      router.refresh();
     },
   });
 
@@ -59,12 +63,12 @@ export function CreateUser() {
           register.mutate({
             firstName: firstName,
             lastName: lastName,
-            currentEmail: currentEmail,
-            currentPassword: password,
+            email: email,
+            password: password,
             confirmPassword: confirmPassword,
             country: country,
             city: city,
-            zipCode: zipCode,
+            postalCode: postalCode,
             address: address,
           });
         }}
@@ -88,8 +92,36 @@ export function CreateUser() {
         <input
           type='text'
           placeholder='email'
-          value={currentEmail}
-          onChange={e => setCurrentEmail(e.target.value)}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
+        />
+        <input
+          type='text'
+          placeholder='country'
+          value={country}
+          onChange={e => setCountry(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
+        />
+        <input
+          type='text'
+          placeholder='city'
+          value={city}
+          onChange={e => setCity(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
+        />
+        <input
+          type='text'
+          placeholder='address'
+          value={address}
+          onChange={e => setAddress(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
+        />
+        <input
+          type='text'
+          placeholder='postalCode'
+          value={postalCode}
+          onChange={e => setPostalCode(e.target.value)}
           className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
@@ -97,6 +129,13 @@ export function CreateUser() {
           placeholder='psw'
           value={password}
           onChange={e => setPassword(e.target.value)}
+          className='px-4 py-2 rounded-full w-full text-black'
+        />
+        <input
+          type='text'
+          placeholder='confirm psw'
+          value={confirmPassword}
+          onChange={e => setConfirmPassword(e.target.value)}
           className='px-4 py-2 rounded-full w-full text-black'
         />
         <button
@@ -112,23 +151,19 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           login.mutate({
-            currentEmail: currentEmail,
-            currentPassword: password,
+            email: email,
+            password: password,
           });
         }}
         className='flex flex-col gap-2'
       >
         <h1>Login User</h1>
-        {data?.isValid && !isLoading ? (
-          <p>Login successful</p>
-        ) : (
-          <p>Login failed</p>
-        )}
+        {data && !isLoading ? <p>Login successful</p> : <p>Login failed</p>}
         <input
           type='text'
           placeholder='email'
-          value={currentEmail}
-          onChange={e => setCurrentEmail(e.target.value)}
+          value={email}
+          onChange={e => setEmail(e.target.value)}
           className='px-4 py-2 rounded-full w-full text-black'
         />
         <input
@@ -151,20 +186,34 @@ export function CreateUser() {
         onSubmit={e => {
           e.preventDefault();
           makeAdmin.mutate({
-            id: id,
-            key: 'hello',
+            id: '',
+            key: '',
           });
         }}
         className='flex flex-col gap-2'
       >
         <h1>Make admin</h1>
-        <input
-          type='text'
-          placeholder='email'
-          value={currentEmail}
-          onChange={e => setCurrentEmail(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
-        />
+        <button
+          type='submit'
+          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
+          disabled={makeAdmin.isPending}
+        >
+          {makeAdmin.isPending ? 'Submitting...' : 'Submit'}
+        </button>
+      </form>
+
+      <form
+        onSubmit={e => {
+          e.preventDefault();
+          makeSuperAdmin.mutate({
+            id: '',
+            adminKey: '',
+            superAdminKey: '',
+          });
+        }}
+        className='flex flex-col gap-2'
+      >
+        <h1>Make superadmin</h1>
         <button
           type='submit'
           className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'

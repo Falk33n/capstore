@@ -14,8 +14,6 @@ export const userRemoveRouter = createTRPCRouter({
   removeUser: publicProcedure
     .input(
       z.object({
-        firstName: z.string().min(1),
-        lastName: z.string().min(1),
         email: z.string().email(),
         password: z.string().min(8),
         confirmPassword: z.string().min(8),
@@ -33,8 +31,6 @@ export const userRemoveRouter = createTRPCRouter({
         });
 
         const validInput =
-          input.firstName === user?.firstName &&
-          input.lastName === user?.lastName &&
           input.email === user?.email &&
           input.password === input.confirmPassword &&
           input.safetySentence === 'I AM SURE';

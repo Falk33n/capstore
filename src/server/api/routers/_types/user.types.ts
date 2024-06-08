@@ -2,7 +2,7 @@ export type JwtPayloadProp = {
   userId: string;
 };
 
-export type UserIPProps = {
+export type UserIpProps = {
   userId: string;
-  hashedIP: string;
+  hashedIp: string;
 }

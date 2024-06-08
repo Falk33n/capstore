@@ -54,9 +54,7 @@ export const authRouter = createTRPCRouter({
               },
             });
 
-            if (ctx.req.ip) {
-              generateAuthCookies(user.id, ctx.req.ip, ctx.resHeaders);
-            }
+            generateAuthCookies(user.id, ctx.req, ctx.resHeaders);
           }
         }
 

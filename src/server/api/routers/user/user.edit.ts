@@ -3,9 +3,7 @@ import { TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
-  checkAdminSession,
   checkSession,
-  checkSuperAdminSession,
   generateId,
   generateSaltHash,
   unauthorizedUser,
@@ -23,6 +21,7 @@ export const userEditRouter = createTRPCRouter({
         postalCode: z.string().min(1).optional(),
         country: z.string().min(1).optional(),
         city: z.string().min(1).optional(),
+        email: z.string().email().optional(),
         newEmail: z.string().email().optional(),
         password: z.string().min(8),
         confirmPassword: z.string().min(8),
@@ -40,6 +39,7 @@ export const userEditRouter = createTRPCRouter({
           postalCode,
           country,
           city,
+          email,
           newEmail,
           password,
           newPassword,
@@ -63,6 +63,9 @@ export const userEditRouter = createTRPCRouter({
         }
         if (lastName) {
           updateUser.lastName = lastName;
+        }
+        if (email) {
+          updateUser.email = email;
         }
         if (newEmail) {
           updateUser.email = newEmail;
@@ -156,7 +159,8 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { id } = await checkAdminSession({ ctx: ctx });
+        //const { id } = await checkAdminSession({ ctx: ctx });
+        const { id } = await checkSession();
 
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
         const admin = await ctx.db.user.findUnique({ where: { id: id } });
@@ -207,7 +211,8 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { id } = await checkSuperAdminSession({ ctx: ctx });
+        //const { id } = await checkSuperAdminSession({ ctx: ctx });
+        const { id } = await checkSession();
 
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
         const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });

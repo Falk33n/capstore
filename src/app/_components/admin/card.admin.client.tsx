@@ -35,7 +35,6 @@ export function AdminCard({
 
   singleData = fetchData();
 
-  // Render a card with a button to go to the statistics page
   return (
     <Card
       className={`relative ${className}`}
@@ -46,12 +45,12 @@ export function AdminCard({
         size='icon'
         aria-label='Go to statistics page'
         title='Go to statistics page'
-        className='absolute top-1/2 -translate-y-1/2 right-2'
+        className='top-1/2 right-2 absolute -translate-y-1/2'
         onClick={() => router.push('/admin/statistics')}
       >
         <ChevronRight className='size-full' />
       </Button>
-      <div className='absolute top-1/2 -translate-y-1/2 left-4 bg-primary text-primary-foreground p-2.5 rounded-xl [&>svg]:size-7'>
+      <div className='top-1/2 left-4 absolute bg-primary p-2.5 rounded-xl text-primary-foreground -translate-y-1/2 [&>svg]:size-7'>
         {children}
       </div>
       <CardHeader>
@@ -59,7 +58,7 @@ export function AdminCard({
           {JSON.stringify(singleData)}
           {title}
         </CardTitle>
-        <CardDescription className='pt-2.5 ml-14 pr-5'>{desc}</CardDescription>
+        <CardDescription className='ml-14 pt-2.5 pr-5'>{desc}</CardDescription>
       </CardHeader>
     </Card>
   );

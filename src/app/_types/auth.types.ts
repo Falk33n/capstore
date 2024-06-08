@@ -1,6 +1,6 @@
 export type UseAuthProps = {
   isLoading: boolean;
-  data?: { isValid: boolean };
+  data?: boolean;
   errorMsg: string;
   successMsg: string;
 };
