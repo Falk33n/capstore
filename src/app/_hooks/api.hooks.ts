@@ -1,21 +1,20 @@
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useToast } from '../_components/_index';
-import type { UseAuthProps } from '../_types/_index';
+import type { ApiHookProps } from '../_types/_index';
 
-// Custom hook to handle authentication messages
 export const useAuth = ({
   isLoading,
-  data,
+  error,
   errorMsg,
   successMsg,
-}: UseAuthProps) => {
+}: ApiHookProps) => {
   const { toast } = useToast();
   const router = useRouter();
 
   useEffect(() => {
     if (isLoading) return;
-    if (!data) {
+    if (error) {
       router.push('/');
       toast({
         variant: 'destructive',
@@ -29,5 +28,5 @@ export const useAuth = ({
         description: successMsg,
       });
     }
-  }, [isLoading, data, errorMsg, successMsg, router, toast]);
+  }, [isLoading, error, errorMsg, successMsg, router, toast]);
 };

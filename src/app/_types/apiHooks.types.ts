@@ -1,6 +1,6 @@
-export type UseAuthProps = {
+export type ApiHookProps = {
   isLoading: boolean;
-  data?: boolean;
+  error: boolean;
   errorMsg: string;
   successMsg: string;
 };

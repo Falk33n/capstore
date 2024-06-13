@@ -1,6 +1,10 @@
-import type { FocusEventHandler, ReactNode } from 'react';
+'use client';
+
+import { useState, type FocusEventHandler, type ReactNode } from 'react';
 import type { UsersCommandProps } from '../../_types/_index';
-import { Input, Label } from '../_index';
+import { Input, Label, cn } from '../_index';
+
+const states = () => ({ hovered: false, focused: false, locked: false });
 
 export function LabelAndInput({
   onBlur,
@@ -15,17 +19,38 @@ export function LabelAndInput({
   autoComplete?: string;
   type?: string;
 }) {
+  const [state, setState] = useState(states);
+
   return (
-    <div className='relative'>
-      <Label className='top-0 left-0 absolute' htmlFor={id}>
+    <div className={cn('relative p-1 mt-4 w-full')}>
+      <Label
+        className={cn(
+          'top-1/2 left-6 absolute text-muted-foreground -mt-[0.1rem] z-0 -translate-y-1/2 bg-background transition-all px-2 py-0.5 rounded-lg',
+          (state.focused || state.hovered || state.locked) && 'text-foreground',
+          state.focused && 'outline-primary outline-2 outline outline-offset-2',
+          state.locked && 'top-1 text-xs border z-[4] mt-0',
+          state.hovered && 'border-foreground',
+        )}
+        htmlFor={id}
+      >
         {children}
       </Label>
       <Input
         id={id}
         name={id}
         type={type ?? 'text'}
+        className={cn(
+          'bg-transparent relative z-[1]',
+          state.hovered && 'border-foreground',
+        )}
         autoComplete={autoComplete ?? 'off'}
-        onBlur={onBlur}
+        onFocus={() => setState({ ...state, focused: true, locked: true })}
+        onMouseEnter={() => setState({ ...state, hovered: true })}
+        onMouseLeave={() => setState({ ...state, hovered: false })}
+        onBlur={e => {
+          setState({ ...state, focused: false });
+          onBlur(e);
+        }}
       />
     </div>
   );

@@ -1,1 +1,1 @@
-export * from './useAuth.hook';
+export * from './api.hooks';

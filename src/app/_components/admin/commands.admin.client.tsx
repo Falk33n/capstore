@@ -19,6 +19,7 @@ import {
   Password,
   PostalCode,
   api,
+  useToast,
 } from '../_index';
 
 const userDetails = () => ({
@@ -41,22 +42,51 @@ export function AdminUserCommand({
 }: {
   actionType: UsersCommandProps;
 }) {
-  const [user, setUser] = useState(userDetails);
+  const [user, setUser] = useState(userDetails());
   const router = useRouter();
+  const { toast } = useToast();
 
-  const handleSuccess = () => {
-    router.refresh();
-    setUser(userDetails);
+  const handleCompletion = (isError: boolean, successMsg?: string) => {
+    if (isError) {
+      toast({
+        variant: 'destructive',
+        title: 'Error!',
+        description: 'Something went wrong, please try again',
+      });
+    } else {
+      router.refresh();
+      setUser(userDetails());
+      toast({
+        variant: 'success',
+        title: 'Success!',
+        description: successMsg,
+      });
+    }
   };
 
   const createUser = api.userCreate.createUser.useMutation({
-    onSuccess: handleSuccess,
+    onError: () => {
+      handleCompletion(true);
+    },
+    onSuccess: () => {
+      handleCompletion(false, 'User created successfully');
+    },
   });
   const removeUser = api.userRemove.removeUserAsAdmin.useMutation({
-    onSuccess: handleSuccess,
+    onError: () => {
+      handleCompletion(true);
+    },
+    onSuccess: () => {
+      handleCompletion(false, 'User removed successfully');
+    },
   });
   const editUser = api.userEdit.editUser.useMutation({
-    onSuccess: handleSuccess,
+    onError: () => {
+      handleCompletion(true);
+    },
+    onSuccess: () => {
+      handleCompletion(false, 'User updated successfully');
+    },
   });
   const getUserByEmail = api.userGet.getUserByEmail.useQuery(
     { email: user.email },
@@ -84,20 +114,26 @@ export function AdminUserCommand({
         break;
       case 'getByEmail':
         await getUserByEmail.refetch();
-        if (getUserByEmail.data) {
-          handleSuccess;
+        if (getUserByEmail.isError) {
+          handleCompletion(true);
+        } else {
+          handleCompletion(false, 'User retrieved successfully');
         }
         break;
       case 'getById':
         await getUserById.refetch();
-        if (getUserById.data) {
-          handleSuccess;
+        if (getUserById.isError) {
+          handleCompletion(true);
+        } else {
+          handleCompletion(false, 'User retrieved successfully');
         }
         break;
       case 'getAll':
         await getAllUsers.refetch();
-        if (getAllUsers.data) {
-          handleSuccess;
+        if (getAllUsers.isError) {
+          handleCompletion(true);
+        } else {
+          handleCompletion(false, 'Users retrieved successfully');
         }
         break;
     }
@@ -125,7 +161,7 @@ export function AdminUserCommand({
 
   return (
     <form
-      className='flex flex-col justify-center items-center gap-6 mx-auto w-3/4'
+      className='flex flex-col justify-center items-center gap-2'
       onSubmit={async e => {
         e.preventDefault();
         await handleSubmit();
@@ -179,9 +215,11 @@ export function AdminUserCommand({
         actionType={actionType}
         onBlur={e => setUser({ ...user, confirmPassword: e.target.value })}
       />
-      <Button className='w-full' type='submit'>
-        {buttonText}
-      </Button>
+      <div className='flex justify-center items-center px-1 py-4 w-full'>
+        <Button className='w-full' type='submit'>
+          {buttonText}
+        </Button>
+      </div>
     </form>
   );
 }
