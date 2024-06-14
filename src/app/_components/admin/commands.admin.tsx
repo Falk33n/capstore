@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useMemo, useState } from 'react';
-import type { UsersCommandProps } from '../../_types/usersCommand.types';
+import type { UsersCommandProps } from '../../_types/_index';
 import {
   Address,
   Button,
@@ -53,15 +53,17 @@ export function AdminUserCommand({
         title: 'Error!',
         description: 'Something went wrong, please try again',
       });
-    } else {
-      router.refresh();
-      setUser(userDetails());
-      toast({
-        variant: 'success',
-        title: 'Success!',
-        description: successMsg,
-      });
+      return false;
     }
+
+    router.refresh();
+    setUser(userDetails());
+    toast({
+      variant: 'success',
+      title: 'Success!',
+      description: successMsg,
+    });
+    return true;
   };
 
   const createUser = api.userCreate.createUser.useMutation({
@@ -161,7 +163,7 @@ export function AdminUserCommand({
 
   return (
     <form
-      className='flex flex-col justify-center items-center gap-2'
+      className='flex flex-col justify-center items-center gap-2 px-12 py-1 pb-3'
       onSubmit={async e => {
         e.preventDefault();
         await handleSubmit();
@@ -215,8 +217,12 @@ export function AdminUserCommand({
         actionType={actionType}
         onBlur={e => setUser({ ...user, confirmPassword: e.target.value })}
       />
-      <div className='flex justify-center items-center px-1 py-4 w-full'>
-        <Button className='w-full' type='submit'>
+      <div className='flex justify-center items-center px-1 py-5 w-full'>
+        <Button
+          variant={actionType === 'remove' ? 'destructive' : 'default'}
+          className='w-full'
+          type='submit'
+        >
           {buttonText}
         </Button>
       </div>

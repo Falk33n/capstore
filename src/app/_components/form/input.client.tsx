@@ -68,7 +68,7 @@ export function Id({
   if (validAction) {
     return (
       <LabelAndInput id='id' onBlur={onBlur}>
-        ID
+        ID <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }
@@ -89,6 +89,9 @@ export function FirstName({
     return (
       <LabelAndInput id='firstName' autoComplete='given-name' onBlur={onBlur}>
         First Name
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -109,6 +112,9 @@ export function LastName({
     return (
       <LabelAndInput id='lastName' autoComplete='family-name' onBlur={onBlur}>
         Last Name
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -129,6 +135,9 @@ export function Country({
     return (
       <LabelAndInput id='country' autoComplete='country-name' onBlur={onBlur}>
         Country
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -149,6 +158,9 @@ export function City({
     return (
       <LabelAndInput id='city' autoComplete='address-level2' onBlur={onBlur}>
         City
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -169,6 +181,9 @@ export function Address({
     return (
       <LabelAndInput id='address' autoComplete='street-address' onBlur={onBlur}>
         Address
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -189,6 +204,9 @@ export function PostalCode({
     return (
       <LabelAndInput id='postalCode' autoComplete='postal-code' onBlur={onBlur}>
         Postal Code
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -218,6 +236,7 @@ export function Email({
         onBlur={onBlur}
       >
         Email
+        {actionType !== 'edit' && <span className='text-destructive'> *</span>}
       </LabelAndInput>
     );
   }
@@ -264,7 +283,7 @@ export function Password({
         type='password'
         onBlur={onBlur}
       >
-        Password
+        Password <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }
@@ -281,7 +300,12 @@ export function NewPassword({
 }) {
   if (actionType === 'edit') {
     return (
-      <LabelAndInput id='new-Password' type='password' onBlur={onBlur}>
+      <LabelAndInput
+        id='newPassword'
+        autoComplete='new-password'
+        type='password'
+        onBlur={onBlur}
+      >
         New Password
       </LabelAndInput>
     );
@@ -306,7 +330,7 @@ export function ConfirmPassword({
   if (validAction) {
     return (
       <LabelAndInput id='confirmPassword' type='password' onBlur={onBlur}>
-        Confirm Password
+        Confirm Password <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }

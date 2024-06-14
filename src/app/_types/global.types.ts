@@ -1,4 +1,3 @@
-// Custom types for the chart component
 export type ChartSingleDataProps = {
   dates?: string[];
   totalNewVisitors?: number[];
@@ -26,3 +25,5 @@ export type ChartYAxisTickProps = {
   y?: number;
   payload?: { value: number };
 };
+
+export type UserRole = 'user' | 'admin' | 'superAdmin' | undefined;

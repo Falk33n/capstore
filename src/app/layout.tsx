@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import '~/styles/globals.scss';
 import { TRPCReactProvider } from '~/trpc/react';
 import { Toaster } from './_components/_index';
+import { RoleProvider } from './_contexts/roles.contexts';
 
 export const metadata = {
   title: 'Create T3 App',
@@ -15,8 +16,10 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang='en' className={`${GeistSans.variable} h-screen`}>
       <body className='h-screen overflow-x-hidden'>
         <TRPCReactProvider>
-          {children}
-          <Toaster />
+          <RoleProvider>
+            {children}
+            <Toaster />
+          </RoleProvider>
         </TRPCReactProvider>
       </body>
     </html>

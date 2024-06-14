@@ -18,74 +18,73 @@ import {
 } from '../_index';
 
 export function AdminSidebar() {
-  // Sidebar for the admin panel with a button to hide/show it
   return (
     <Drawer direction='left'>
       <DrawerTrigger
         asChild
-        className='fixed top-[100rem] md:top-1/2 -translate-y-1/2 left-3'
+        className='top-[100rem] md:top-1/2 left-3 fixed -translate-y-1/2'
       >
         <Button
           variant='icon'
-          className='h-20 w-2 rounded-full bg-muted-foreground/20'
+          className='bg-muted-foreground/20 rounded-full w-2 h-20'
           size='icon'
           aria-label='Open sidebar'
           title='Open Sidebar'
         />
       </DrawerTrigger>
-      <DrawerContent className='py-4 px-7'>
+      <DrawerContent className='px-7 py-4'>
         <DrawerClose
           asChild
-          className='absolute top-1/2 -translate-y-1/2 right-3'
+          className='top-1/2 right-3 absolute -translate-y-1/2'
         >
           <Button
             variant='icon'
-            className='h-20 w-2 rounded-full bg-muted-foreground/20'
+            className='bg-muted-foreground/20 rounded-full w-2 h-20'
             size='icon'
             aria-label='Open sidebar'
             title='Open Sidebar'
           />
         </DrawerClose>
-        <div className='flex-1 flex flex-col w-full'>
+        <div className='flex flex-col flex-1 w-full'>
           <DrawerHeader>
             <DrawerTitle className='text-center text-lg'>
               Admin Navigation
             </DrawerTitle>
           </DrawerHeader>
-          <div className='flex flex-col items-center justify-center w-full gap-5 pt-1.5'>
+          <div className='flex flex-col justify-center items-center gap-5 pt-1.5 w-full'>
             <Link
               href='/admin/dashboard'
-              className='font-medium text-base text-foreground w-full px-8 flex items-center justify-between bg-muted rounded-lg whitespace-nowrap py-3 transition-colors hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white'
+              className='flex justify-between items-center bg-muted hover:bg-primary focus-visible:bg-primary px-8 py-3 rounded-lg w-full font-medium text-base text-foreground hover:text-white focus-visible:text-white whitespace-nowrap transition-colors'
             >
               Dashboard
               <LayoutDashboard className='size-5' />
             </Link>
             <Link
               href='/admin/commands'
-              className='font-medium text-base text-foreground w-full px-8 flex items-center justify-between bg-muted rounded-lg whitespace-nowrap py-3 transition-colors hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white'
+              className='flex justify-between items-center bg-muted hover:bg-primary focus-visible:bg-primary px-8 py-3 rounded-lg w-full font-medium text-base text-foreground hover:text-white focus-visible:text-white whitespace-nowrap transition-colors'
             >
               Admin Commands
               <ShieldEllipsis className='size-5' />
             </Link>
             <Link
               href='/admin/statistics'
-              className='font-medium text-base text-foreground px-8 w-full flex items-center justify-between bg-muted rounded-lg py-3 transition-colors hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white'
+              className='flex justify-between items-center bg-muted hover:bg-primary focus-visible:bg-primary px-8 py-3 rounded-lg w-full font-medium text-base text-foreground hover:text-white focus-visible:text-white transition-colors'
             >
               Statistics
               <BarChartHorizontalBig className='size-5' />
             </Link>
             <Link
               href='/admin/logs'
-              className='font-medium text-base text-foreground px-8 w-full flex items-center justify-between bg-muted rounded-lg py-3 transition-colors hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white'
+              className='flex justify-between items-center bg-muted hover:bg-primary focus-visible:bg-primary px-8 py-3 rounded-lg w-full font-medium text-base text-foreground hover:text-white focus-visible:text-white transition-colors'
             >
               Logs
               <FileSliders className='size-5' />
             </Link>
           </div>
-          <DrawerFooter className='w-full px-0'>
+          <DrawerFooter className='px-0 w-full'>
             <Link
               href='/'
-              className='font-medium text-foreground flex items-center justify-between bg-muted rounded-lg px-8 py-3 transition-colors hover:bg-primary hover:text-white focus-visible:bg-primary focus-visible:text-white'
+              className='flex justify-between items-center bg-muted hover:bg-primary focus-visible:bg-primary px-8 py-3 rounded-lg font-medium text-foreground hover:text-white focus-visible:text-white transition-colors'
             >
               Home
               <Home aria-hidden className='size-5' />

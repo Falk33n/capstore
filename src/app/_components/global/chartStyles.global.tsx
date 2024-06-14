@@ -6,8 +6,6 @@ import type {
   ChartYAxisTickProps,
 } from '../../_types/_index';
 
-// Custom components to style the chart from 'recharts'
-
 export function ChartXAxisTick({ x, y, payload }: ChartXAxisTickProps) {
   return (
     <text x={x} y={y! + 17} fill='#666' fontWeight='600' textAnchor='middle'>

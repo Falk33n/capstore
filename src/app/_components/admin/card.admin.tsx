@@ -3,8 +3,8 @@
 import { ChevronRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { getTodayChartData } from '../../_helpers/charts.helpers';
-import type { ChartAllDataProps } from '../../_types/charts.types';
+import { getTodayChartData } from '../../_helpers/_index';
+import type { ChartAllDataProps } from '../../_types/_index';
 import {
   Button,
   Card,
