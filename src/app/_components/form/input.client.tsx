@@ -1,6 +1,10 @@
-import type { FocusEventHandler, ReactNode } from 'react';
+'use client';
+
+import { useState, type FocusEventHandler, type ReactNode } from 'react';
 import type { UsersCommandProps } from '../../_types/_index';
-import { Input, Label } from '../_index';
+import { Input, Label, cn } from '../_index';
+
+const states = () => ({ hovered: false, focused: false, locked: false });
 
 export function LabelAndInput({
   onBlur,
@@ -15,17 +19,38 @@ export function LabelAndInput({
   autoComplete?: string;
   type?: string;
 }) {
+  const [state, setState] = useState(states);
+
   return (
-    <div className='relative'>
-      <Label className='top-0 left-0 absolute' htmlFor={id}>
+    <div className={cn('relative p-1 mt-4 w-full')}>
+      <Label
+        className={cn(
+          'top-1/2 left-6 absolute text-muted-foreground -mt-[0.1rem] z-0 -translate-y-1/2 bg-background transition-all px-2 py-0.5 rounded-lg',
+          (state.focused || state.hovered || state.locked) && 'text-foreground',
+          state.focused && 'outline-primary outline-2 outline outline-offset-2',
+          state.locked && 'top-1 text-xs border z-[4] mt-0',
+          state.hovered && 'border-foreground',
+        )}
+        htmlFor={id}
+      >
         {children}
       </Label>
       <Input
         id={id}
         name={id}
         type={type ?? 'text'}
+        className={cn(
+          'bg-transparent relative z-[1]',
+          state.hovered && 'border-foreground',
+        )}
         autoComplete={autoComplete ?? 'off'}
-        onBlur={onBlur}
+        onFocus={() => setState({ ...state, focused: true, locked: true })}
+        onMouseEnter={() => setState({ ...state, hovered: true })}
+        onMouseLeave={() => setState({ ...state, hovered: false })}
+        onBlur={e => {
+          setState({ ...state, focused: false });
+          onBlur(e);
+        }}
       />
     </div>
   );
@@ -43,7 +68,7 @@ export function Id({
   if (validAction) {
     return (
       <LabelAndInput id='id' onBlur={onBlur}>
-        ID
+        ID <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }
@@ -64,6 +89,9 @@ export function FirstName({
     return (
       <LabelAndInput id='firstName' autoComplete='given-name' onBlur={onBlur}>
         First Name
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -84,6 +112,9 @@ export function LastName({
     return (
       <LabelAndInput id='lastName' autoComplete='family-name' onBlur={onBlur}>
         Last Name
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -104,6 +135,9 @@ export function Country({
     return (
       <LabelAndInput id='country' autoComplete='country-name' onBlur={onBlur}>
         Country
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -124,6 +158,9 @@ export function City({
     return (
       <LabelAndInput id='city' autoComplete='address-level2' onBlur={onBlur}>
         City
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -144,6 +181,9 @@ export function Address({
     return (
       <LabelAndInput id='address' autoComplete='street-address' onBlur={onBlur}>
         Address
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -164,6 +204,9 @@ export function PostalCode({
     return (
       <LabelAndInput id='postalCode' autoComplete='postal-code' onBlur={onBlur}>
         Postal Code
+        {actionType === 'create' && (
+          <span className='text-destructive'> *</span>
+        )}
       </LabelAndInput>
     );
   }
@@ -193,6 +236,7 @@ export function Email({
         onBlur={onBlur}
       >
         Email
+        {actionType !== 'edit' && <span className='text-destructive'> *</span>}
       </LabelAndInput>
     );
   }
@@ -239,7 +283,7 @@ export function Password({
         type='password'
         onBlur={onBlur}
       >
-        Password
+        Password <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }
@@ -256,7 +300,12 @@ export function NewPassword({
 }) {
   if (actionType === 'edit') {
     return (
-      <LabelAndInput id='new-Password' type='password' onBlur={onBlur}>
+      <LabelAndInput
+        id='newPassword'
+        autoComplete='new-password'
+        type='password'
+        onBlur={onBlur}
+      >
         New Password
       </LabelAndInput>
     );
@@ -281,7 +330,7 @@ export function ConfirmPassword({
   if (validAction) {
     return (
       <LabelAndInput id='confirmPassword' type='password' onBlur={onBlur}>
-        Confirm Password
+        Confirm Password <span className='text-destructive'>*</span>
       </LabelAndInput>
     );
   }

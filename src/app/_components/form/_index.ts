@@ -1,1 +1,1 @@
-export * from './input.server'
+export * from './input.client'

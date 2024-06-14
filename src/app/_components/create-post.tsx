@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { api } from './_index';
@@ -57,6 +58,7 @@ export function CreateUser() {
 
   return (
     <>
+      <Link href='/admin/commands'>Go to Admin page</Link>
       <form
         onSubmit={e => {
           e.preventDefault();

@@ -1,10 +1,10 @@
 import { Eye, HandCoins, ShoppingCart, Users } from 'lucide-react';
 import {
+  AdminAuth,
   AdminCard,
   AdminFullChart,
   AdminHeader,
   AdminSearchbar,
-  AdminSession,
   AdminSidebar,
   Separator,
 } from '../../_components/_index';
@@ -12,17 +12,17 @@ import {
 // The main page of the admin route
 export default function AdminDashboard() {
   return (
-    <AdminSession>
+    <AdminAuth>
       <AdminSidebar />
 
-      <div className='flex flex-col gap-3.5 sm:min-h-[87.5%] sm:min-w-[92.5%] min-w-full min-h-full p-4 md:p-12 md:pt-8'>
+      <div className='flex flex-col gap-3.5 p-4 md:p-12 md:pt-8 min-w-full sm:min-w-[92.5%] min-h-full sm:min-h-[87.5%]'>
         <section>
           <AdminHeader />
         </section>
 
         <AdminSearchbar />
 
-        <div className='flex flex-col gap-y-3.5 md:flex-row md:flex-wrap md:justify-between'>
+        <div className='flex md:flex-row flex-col md:flex-wrap md:justify-between gap-y-3.5'>
           <AdminCard
             title='insert active today'
             desc='Total visitors today'
@@ -55,14 +55,14 @@ export default function AdminDashboard() {
 
         <Separator className='my-3.5' />
 
-        <div className='flex flex-col gap-3.5 md:flex-row md:items-center'>
-          <div className='md:flex-1 md:-ml-8 md:-mb-5'>
+        <div className='flex md:flex-row flex-col md:items-center gap-3.5'>
+          <div className='md:flex-1 md:-mb-5 md:-ml-8'>
             <AdminFullChart />
           </div>
 
-          <div className='flex flex-col gap-3.5 md:w-[29rem] md:pl-7 md:relative'>
+          <div className='md:relative flex flex-col gap-3.5 md:pl-7 md:w-[29rem]'>
             <Separator
-              className='hidden md:block md:absolute md:left-1.5 md:top-0'
+              className='md:block md:top-0 md:left-1.5 md:absolute hidden'
               orientation='vertical'
             />
 
@@ -93,6 +93,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-    </AdminSession>
+    </AdminAuth>
   );
 }

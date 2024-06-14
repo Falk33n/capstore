@@ -1,3 +1,2 @@
-export * from './auth.types';
-export * from './charts.types';
-export * from './usersCommand.types';
+export * from './admin.types';
+export * from './global.types';

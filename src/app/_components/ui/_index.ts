@@ -8,6 +8,8 @@ export * from './drawer';
 export * from './form';
 export * from './input';
 export * from './label';
+export * from './loader';
+export * from './menubar';
 export * from './popover';
 export * from './select';
 export * from './separator';
