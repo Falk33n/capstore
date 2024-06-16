@@ -159,7 +159,6 @@ export const userEditRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        //const { id } = await checkAdminSession({ ctx: ctx });
         const { id } = await checkSession();
 
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
