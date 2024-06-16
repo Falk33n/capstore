@@ -17,11 +17,11 @@ export function RoleProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (isLoading) return;
     else if (data) {
-      if (data.superAdmin) {
-        setRole('superAdmin');
+      if (data.developer) {
+        setRole('developer');
       } else if (data.admin) {
         setRole('admin');
-      } else if (!data.admin && !data.superAdmin) {
+      } else if (!data.admin && !data.developer) {
         setRole('user');
       }
     } else if (!data) {

@@ -26,4 +26,4 @@ export type ChartYAxisTickProps = {
   payload?: { value: number };
 };
 
-export type UserRole = 'user' | 'admin' | 'superAdmin' | undefined;
+export type UserRole = 'user' | 'admin' | 'developer' | undefined;

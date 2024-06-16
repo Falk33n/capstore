@@ -41,7 +41,7 @@ export const userGetRouter = createTRPCRouter({
           city: userAddress.city,
           postalCode: userAddress.postalCode,
           admin: userRole.admin,
-          superAdmin: userRole.superAdmin,
+          developer: userRole.developer,
         };
       }
 
@@ -103,7 +103,7 @@ export const userGetRouter = createTRPCRouter({
             city: userAddress.city,
             postalCode: userAddress.postalCode,
             admin: userRole.admin,
-            superAdmin: userRole.superAdmin,
+            developer: userRole.developer,
           };
         }
 
@@ -118,70 +118,6 @@ export const userGetRouter = createTRPCRouter({
             id: generateId(),
             action: 'FAILED GET USER BY EMAIL',
             description: 'Someone tried to retrieve a user by email',
-          },
-        });
-
-        unknownError();
-      }
-    }),
-
-  getUserById: publicProcedure
-    .input(
-      z.object({
-        id: z.string().min(1),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      try {
-        const { id } = await checkAdminSession({ ctx: ctx });
-
-        const admin = await ctx.db.user.findUnique({
-          where: {
-            id: id,
-          },
-        });
-        const [user, userAddress, userRole] = await Promise.all([
-          ctx.db.user.findUnique({ where: { id: input.id } }),
-          ctx.db.userAddress.findUnique({ where: { userId: input.id } }),
-          ctx.db.userRole.findUnique({ where: { userId: input.id } }),
-        ]);
-
-        const validData = id && admin && user && userAddress && userRole;
-
-        if (validData) {
-          await ctx.db.userLog.create({
-            data: {
-              id: generateId(),
-              action: 'GET USER BY ID',
-              description: `The admin ${admin.firstName} ${admin.lastName} retrieved the user ${user.firstName} ${user.lastName} by ID`,
-            },
-          });
-
-          return {
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            address: userAddress.address,
-            country: userAddress.country,
-            city: userAddress.city,
-            postalCode: userAddress.postalCode,
-            admin: userRole.admin,
-            superAdmin: userRole.superAdmin,
-          };
-        }
-
-        if (!id) {
-          unauthorizedUser();
-        } else if (!validData) {
-          unknownUser();
-        }
-      } catch (e) {
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'FAILED GET USER BY ID',
-            description: 'Someone tried to retrieve a user by ID',
           },
         });
 
@@ -222,7 +158,7 @@ export const userGetRouter = createTRPCRouter({
               city: userAddress.city,
               postalCode: userAddress.postalCode,
               admin: userRole.admin,
-              superAdmin: userRole.superAdmin,
+              developer: userRole.developer,
             };
           } else {
             unknownError();

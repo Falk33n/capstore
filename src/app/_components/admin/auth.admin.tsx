@@ -11,7 +11,7 @@ export function AdminAuth({ children }: { children: ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (role === 'superAdmin' || role === 'admin') {
+    if (role === 'developer' || role === 'admin') {
       return;
     } else {
       toast({
@@ -23,9 +23,9 @@ export function AdminAuth({ children }: { children: ReactNode }) {
     }
   }, [role, toast, router]);
 
-  if (role === 'superAdmin' || role === 'admin') {
+  if (role === 'developer' || role === 'admin') {
     return (
-      <div className='flex justify-center items-center bg-card w-full h-full'>
+      <div className='relative flex flex-col items-center bg-card size-full'>
         {children}
       </div>
     );

@@ -10,7 +10,6 @@ datasource db {
     url      = env("SECRET_DATABASE_URL")
 }
 
-// Model for the User table
 model User {
     id              String      @unique    @id 
     firstName       String
@@ -23,7 +22,6 @@ model User {
     updatedAt       DateTime    @updatedAt
 }
 
-// Model for the Password table
 model UserPassword {
     id              String      @unique    @id 
     salt            String
@@ -34,7 +32,6 @@ model UserPassword {
     updatedAt       DateTime    @updatedAt
 }
 
-// Model for the Address table
 model UserAddress {
     id              String      @unique    @id 
     country         String
@@ -47,18 +44,16 @@ model UserAddress {
     updatedAt       DateTime    @updatedAt
 }
 
-// Model for the role table
 model UserRole {
     id              String      @unique    @id 
     admin           Boolean     @default(false)
-    superAdmin      Boolean     @default(false) 
+    developer       Boolean     @default(false) 
     user            User        @relation(fields: [userId], references: [id])
     userId          String      @unique
     createdAt       DateTime    @default(now())
     updatedAt       DateTime    @updatedAt
 }
 
-// Model for the UserLog table
 model UserLog {
     id              String      @unique    @id 
     action          String
