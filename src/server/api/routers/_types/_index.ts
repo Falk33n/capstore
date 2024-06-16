@@ -1,2 +1,2 @@
 export * from './user.types'
-export * from './all.types'
+export * from './global.types'
