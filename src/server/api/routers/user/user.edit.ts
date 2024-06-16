@@ -154,7 +154,7 @@ export const userEditRouter = createTRPCRouter({
     .input(
       z.object({
         id: z.string().min(1),
-        key: z.string().min(1),
+        developerKey: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
@@ -166,7 +166,7 @@ export const userEditRouter = createTRPCRouter({
         const admin = await ctx.db.user.findUnique({ where: { id: id } });
 
         const validData =
-          input.key === process.env.SECRET_ADMIN_KEY && id && user && admin;
+          input.developerKey === process.env.SECRET_DEVELOPER_KEY && id && user && admin;
 
         if (validData) {
           await ctx.db.userLog.create({
@@ -217,7 +217,7 @@ export const userEditRouter = createTRPCRouter({
         const validData =
           input.developerKey === process.env.SECRET_DEVELOPER_KEY &&
           id &&
-          user &&
+          user
 
         if (validData) {
           await ctx.db.userLog.create({
