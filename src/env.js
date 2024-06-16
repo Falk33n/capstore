@@ -9,11 +9,10 @@ export const env = createEnv({
   server: {
     SECRET_DATABASE_URL: z.string().url(),
     SECRET_JWT_KEY: z.string(),
-    SECRET_ADMIN_KEY: z.string(),
-    SECRET_SUPER_ADMIN_KEY: z.string(),
+    SECRET_DEVELOPER_KEY: z.string(),
     NODE_ENV: z
       .enum(['development', 'test', 'production'])
-      .default('development'),
+      .default('development')
   },
 
   /**
@@ -32,9 +31,8 @@ export const env = createEnv({
   runtimeEnv: {
     SECRET_DATABASE_URL: process.env.SECRET_DATABASE_URL,
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
-    SECRET_ADMIN_KEY: process.env.SECRET_ADMIN_KEY,
-    SECRET_SUPER_ADMIN_KEY: process.env.SECRET_SUPER_ADMIN_KEY,
-    NODE_ENV: process.env.NODE_ENV,
+    SECRET_DEVELOPER_KEY: process.env.SECRET_DEVELOPER_KEY,
+    NODE_ENV: process.env.NODE_ENV
     // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
   },
   /**
@@ -46,5 +44,5 @@ export const env = createEnv({
    * Makes it so that empty strings are treated as undefined. `SOME_VAR: z.string()` and
    * `SOME_VAR=''` will throw an error.
    */
-  emptyStringAsUndefined: true,
+  emptyStringAsUndefined: true
 });

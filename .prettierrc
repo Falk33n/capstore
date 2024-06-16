@@ -9,5 +9,7 @@
   "embeddedLanguageFormatting": "auto",
   "htmlWhitespaceSensitivity": "css",
   "jsxSingleQuote": true,
-  "proseWrap": "never"
+  "proseWrap": "never",
+  "trailingComma": "none",
+  "plugins": ["prettier-plugin-tailwindcss"]
 }

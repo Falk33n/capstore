@@ -3,9 +3,7 @@ import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
   authenticatePassword,
-  checkAdminSession,
   checkSession,
-  checkSuperAdminSession,
   generateAuthCookies,
   generateId,
   unauthorizedUser,
@@ -105,82 +103,6 @@ export const authRouter = createTRPCRouter({
           id: generateId(),
           action: 'FAILED CHECK SESSION',
           description: 'Someone failed authentication',
-        },
-      });
-
-      unknownError();
-    }
-  }),
-
-  checkAdminSession: publicProcedure.query(async ({ ctx }) => {
-    try {
-      const { isValid, id } = await checkAdminSession({ ctx: ctx });
-
-      const admin = await ctx.db.user.findUnique({ where: { id: id } });
-
-      const validData = isValid && id && admin;
-
-      if (validData) {
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'CHECK ADMIN SESSION',
-            description: `The admin ${admin.firstName} ${admin.lastName} was authenticated`,
-          },
-        });
-
-        return true;
-      }
-
-      if (!admin) {
-        unknownUser();
-      } else if (!isValid) {
-        unauthorizedUser();
-      }
-    } catch (e) {
-      await ctx.db.userLog.create({
-        data: {
-          id: generateId(),
-          action: 'FAILED CHECK ADMIN SESSION',
-          description: 'Someone failed admin authentication',
-        },
-      });
-
-      unknownError();
-    }
-  }),
-
-  checkSuperAdminSession: publicProcedure.query(async ({ ctx }) => {
-    try {
-      const { isValid, id } = await checkSuperAdminSession({ ctx: ctx });
-
-      const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
-
-      const validData = isValid && id && superAdmin;
-
-      if (validData) {
-        await ctx.db.userLog.create({
-          data: {
-            id: generateId(),
-            action: 'CHECK SUPER ADMIN SESSION',
-            description: `The superAdmin ${superAdmin.firstName} ${superAdmin.lastName} was authenticated`,
-          },
-        });
-
-        return true;
-      }
-
-      if (!superAdmin) {
-        unknownUser();
-      } else if (!isValid) {
-        unauthorizedUser();
-      }
-    } catch (e) {
-      await ctx.db.userLog.create({
-        data: {
-          id: generateId(),
-          action: 'FAILED CHECK SUPER ADMIN SESSION',
-          description: 'Someone failed super admin authentication',
         },
       });
 

@@ -46,7 +46,7 @@ export function CreateUser() {
     },
   });
 
-  const makeSuperAdmin = api.userEdit.makeSuperAdmin.useMutation({
+  const makeDeveloper = api.userEdit.makeDeveloper.useMutation({
     onSuccess: () => {
       router.refresh();
     },
@@ -58,7 +58,7 @@ export function CreateUser() {
 
   return (
     <>
-      <Link href='/admin/commands'>Go to Admin page</Link>
+      <Link href='/admin/actions'>Go to Admin page</Link>
       <form
         onSubmit={e => {
           e.preventDefault();
@@ -207,15 +207,14 @@ export function CreateUser() {
       <form
         onSubmit={e => {
           e.preventDefault();
-          makeSuperAdmin.mutate({
+          makeDeveloper.mutate({
             id: '',
-            adminKey: '',
-            superAdminKey: '',
+            developerKey: '',
           });
         }}
         className='flex flex-col gap-2'
       >
-        <h1>Make superadmin</h1>
+        <h1>Make developer</h1>
         <button
           type='submit'
           className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'

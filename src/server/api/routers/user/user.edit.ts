@@ -201,41 +201,36 @@ export const userEditRouter = createTRPCRouter({
       }
     }),
 
-  makeSuperAdmin: publicProcedure
+  makeDeveloper: publicProcedure
     .input(
       z.object({
         id: z.string().min(1),
-        adminKey: z.string().min(1),
-        superAdminKey: z.string().min(1),
+        developerKey: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        //const { id } = await checkSuperAdminSession({ ctx: ctx });
         const { id } = await checkSession();
 
         const user = await ctx.db.user.findUnique({ where: { id: input.id } });
-        const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
 
         const validData =
-          input.adminKey === process.env.SECRET_ADMIN_KEY &&
-          input.superAdminKey === process.env.SECRET_SUPER_ADMIN_KEY &&
+          input.developerKey === process.env.SECRET_DEVELOPER_KEY &&
           id &&
           user &&
-          superAdmin;
 
         if (validData) {
           await ctx.db.userLog.create({
             data: {
               id: generateId(),
               action: 'MAKE USER SUPER ADMIN',
-              description: `The user ${user.firstName} ${user.lastName} was made an super admin by the super admin ${superAdmin.firstName} ${superAdmin.lastName}`,
+              description: `The user ${user.firstName} ${user.lastName} was made an Developer`,
             },
           });
 
           await ctx.db.userRole.update({
             where: { userId: user.id },
-            data: { superAdmin: true },
+            data: { developer: true },
           });
         }
 

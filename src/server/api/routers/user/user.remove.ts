@@ -1,9 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
-  checkAdminSession,
   checkSession,
-  checkSuperAdminSession,
   generateId,
   unauthorizedUser,
   unknownError,
@@ -130,27 +128,25 @@ export const userRemoveRouter = createTRPCRouter({
   removeAllUsers: publicProcedure
     .input(
       z.object({
-        adminKey: z.string().min(1),
-        superAdminKey: z.string().min(1),
+        developerKey: z.string().min(1),
       }),
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { id } = await checkSuperAdminSession({ ctx: ctx });
+        const { id } = await checkSession();
 
-        const superAdmin = await ctx.db.user.findUnique({ where: { id: id } });
+        const developer = await ctx.db.user.findUnique({ where: { id: id } });
 
         const validKeys =
-          input.adminKey === process.env.SECRET_ADMIN_KEY &&
-          input.superAdminKey === process.env.SECRET_SUPER_ADMIN_KEY;
-        const validData = id && validKeys && superAdmin;
+          input.developerKey === process.env.SECRET_DEVELOPER_KEY;
+        const validData = id && validKeys && developer;
 
         if (validData) {
           await ctx.db.userLog.create({
             data: {
               id: generateId(),
               action: 'DELETE ALL USERS',
-              description: `The super admin ${superAdmin.firstName} ${superAdmin.lastName} deleted all users`,
+              description: `The super admin ${developer.firstName} ${developer.lastName} deleted all users`,
             },
           });
 
@@ -160,7 +156,7 @@ export const userRemoveRouter = createTRPCRouter({
           await ctx.db.user.deleteMany();
         }
 
-        if (!superAdmin) {
+        if (!developer) {
           unknownUser();
         } else if (!validData) {
           unauthorizedUser();
