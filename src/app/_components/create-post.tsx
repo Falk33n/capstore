@@ -29,7 +29,7 @@ export function CreateUser() {
       setCity('');
       setPostalCode('');
       setAddress('');
-    },
+    }
   });
 
   const login = api.auth.loginUser.useMutation({
@@ -37,23 +37,23 @@ export function CreateUser() {
       router.refresh();
       setEmail('');
       setPassword('');
-    },
+    }
   });
 
   const makeAdmin = api.userEdit.makeAdmin.useMutation({
     onSuccess: () => {
       router.refresh();
-    },
+    }
   });
 
   const makeDeveloper = api.userEdit.makeDeveloper.useMutation({
     onSuccess: () => {
       router.refresh();
-    },
+    }
   });
 
   const { data, isLoading } = api.auth.checkSession.useQuery(undefined, {
-    retry: false,
+    retry: false
   });
 
   return (
@@ -71,7 +71,7 @@ export function CreateUser() {
             country: country,
             city: city,
             postalCode: postalCode,
-            address: address,
+            address: address
           });
         }}
         className='flex flex-col gap-2'
@@ -82,67 +82,67 @@ export function CreateUser() {
           placeholder='fName'
           value={firstName}
           onChange={e => setFirstName(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='lName'
           value={lastName}
           onChange={e => setLastName(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='email'
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='country'
           value={country}
           onChange={e => setCountry(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='city'
           value={city}
           onChange={e => setCity(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='address'
           value={address}
           onChange={e => setAddress(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='postalCode'
           value={postalCode}
           onChange={e => setPostalCode(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='psw'
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='confirm psw'
           value={confirmPassword}
           onChange={e => setConfirmPassword(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <button
           type='submit'
-          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
+          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
           disabled={login.isPending}
         >
           {register.isPending ? 'Submitting...' : 'Submit'}
@@ -154,7 +154,7 @@ export function CreateUser() {
           e.preventDefault();
           login.mutate({
             email: email,
-            password: password,
+            password: password
           });
         }}
         className='flex flex-col gap-2'
@@ -166,18 +166,18 @@ export function CreateUser() {
           placeholder='email'
           value={email}
           onChange={e => setEmail(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <input
           type='text'
           placeholder='psw'
           value={password}
           onChange={e => setPassword(e.target.value)}
-          className='px-4 py-2 rounded-full w-full text-black'
+          className='w-full rounded-full px-4 py-2 text-black'
         />
         <button
           type='submit'
-          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
+          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
           disabled={login.isPending}
         >
           {login.isPending ? 'Submitting...' : 'Submit'}
@@ -189,7 +189,7 @@ export function CreateUser() {
           e.preventDefault();
           makeAdmin.mutate({
             id: '',
-            key: '',
+            developerKey: ''
           });
         }}
         className='flex flex-col gap-2'
@@ -197,7 +197,7 @@ export function CreateUser() {
         <h1>Make admin</h1>
         <button
           type='submit'
-          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
+          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
           disabled={makeAdmin.isPending}
         >
           {makeAdmin.isPending ? 'Submitting...' : 'Submit'}
@@ -209,7 +209,7 @@ export function CreateUser() {
           e.preventDefault();
           makeDeveloper.mutate({
             id: '',
-            developerKey: '',
+            developerKey: ''
           });
         }}
         className='flex flex-col gap-2'
@@ -217,7 +217,7 @@ export function CreateUser() {
         <h1>Make developer</h1>
         <button
           type='submit'
-          className='bg-white/10 hover:bg-white/20 px-10 py-3 rounded-full font-semibold transition'
+          className='rounded-full bg-white/10 px-10 py-3 font-semibold transition hover:bg-white/20'
           disabled={makeAdmin.isPending}
         >
           {makeAdmin.isPending ? 'Submitting...' : 'Submit'}

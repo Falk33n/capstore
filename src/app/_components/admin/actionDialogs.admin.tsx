@@ -29,7 +29,7 @@ export function AdminEditAction({ user }: { user: UserTableProps }) {
   return (
     <Dialog>
       <DialogTrigger asChild title='Edit'>
-        <Button className='mr-2.5 p-1.5 rounded-md size-7'>
+        <Button className='mr-2.5 size-7 rounded-md p-1.5'>
           <Pencil className='size-full' />
         </Button>
       </DialogTrigger>
@@ -41,9 +41,9 @@ export function AdminEditAction({ user }: { user: UserTableProps }) {
             done.
           </DialogDescription>
         </DialogHeader>
-        <div className='gap-4 grid py-4'>
+        <div className='grid gap-4 py-4'>
           {Object.entries(user).map(([prop, val], i) => (
-            <div key={i} className='items-center gap-4 grid grid-cols-4'>
+            <div key={i} className='grid grid-cols-4 items-center gap-4'>
               <Label htmlFor={prop} className='text-right'>
                 {userTablePropsMapped[prop as keyof UserTableProps]}
               </Label>
@@ -67,7 +67,7 @@ export function AdminDeleteAction({ email }: { email: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild title='Delete'>
-        <Button variant='destructive' className='p-1.5 rounded-md size-7'>
+        <Button variant='destructive' className='size-7 rounded-md p-1.5'>
           <Trash2 className='size-full' />
         </Button>
       </DialogTrigger>
@@ -79,8 +79,8 @@ export function AdminDeleteAction({ email }: { email: string }) {
             account and remove the data from the servers.
           </DialogDescription>
         </DialogHeader>
-        <div className='gap-4 grid py-4'>
-          <div className='items-center gap-4 grid grid-cols-4'>
+        <div className='grid gap-4 py-4'>
+          <div className='grid grid-cols-4 items-center gap-4'>
             <Label htmlFor='email' className='text-right'>
               Email Address
             </Label>

@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { createTRPCRouter, publicProcedure } from '../../trpc';
 import {
-  checkAdminSession,
+  
   checkSession,
   generateId,
   unauthorizedUser,
@@ -69,7 +69,7 @@ export const userGetRouter = createTRPCRouter({
     )
     .query(async ({ ctx, input }) => {
       try {
-        const { id } = await checkAdminSession({ ctx: ctx });
+        const { id } = await checkSession();
 
         const [user, userAddress, userRole] = await Promise.all([
           ctx.db.user.findUnique({ where: { email: input.email } }),
@@ -127,7 +127,7 @@ export const userGetRouter = createTRPCRouter({
 
   getAllUsers: publicProcedure.query(async ({ ctx }) => {
     try {
-      const { id } = await checkAdminSession({ ctx: ctx });
+      const { id } = await checkSession();
 
       const admin = await ctx.db.user.findUnique({ where: { id: id } });
       const [users, userAddresses, userRoles] = await Promise.all([

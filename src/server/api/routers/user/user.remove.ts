@@ -5,7 +5,7 @@ import {
   generateId,
   unauthorizedUser,
   unknownError,
-  unknownUser,
+  unknownUser
 } from '../_helpers/_index';
 
 export const userRemoveRouter = createTRPCRouter({
@@ -15,8 +15,8 @@ export const userRemoveRouter = createTRPCRouter({
         email: z.string().email(),
         password: z.string().min(8),
         confirmPassword: z.string().min(8),
-        safetySentence: z.string().min(1),
-      }),
+        safetySentence: z.string().min(1)
+      })
     )
     .mutation(async ({ ctx, input }) => {
       try {
@@ -24,8 +24,8 @@ export const userRemoveRouter = createTRPCRouter({
 
         const user = await ctx.db.user.findUnique({
           where: {
-            id: id,
-          },
+            id: id
+          }
         });
 
         const validInput =
@@ -39,8 +39,8 @@ export const userRemoveRouter = createTRPCRouter({
             data: {
               id: generateId(),
               action: 'DELETE USER',
-              description: `The former user ${user.firstName} ${user.lastName} deleted their account`,
-            },
+              description: `The former user ${user.firstName} ${user.lastName} deleted their account`
+            }
           });
 
           await ctx.db.userRole.delete({ where: { userId: user.id } });
@@ -59,8 +59,8 @@ export const userRemoveRouter = createTRPCRouter({
           data: {
             id: generateId(),
             action: 'FAILED DELETE USER',
-            description: 'Someone tried to delete their account',
-          },
+            description: 'Someone tried to delete their account'
+          }
         });
 
         unknownError();
@@ -70,22 +70,22 @@ export const userRemoveRouter = createTRPCRouter({
   removeUserAsAdmin: publicProcedure
     .input(
       z.object({
-        email: z.string().email(),
-      }),
+        email: z.string().email()
+      })
     )
     .mutation(async ({ ctx, input }) => {
       try {
-        const { id } = await checkAdminSession({ ctx: ctx });
+        const { id } = await checkSession();
 
         const user = await ctx.db.user.findUnique({
           where: {
-            email: input.email,
-          },
+            email: input.email
+          }
         });
         const admin = await ctx.db.user.findUnique({
           where: {
-            id: id,
-          },
+            id: id
+          }
         });
 
         const validData = user && admin && id;
@@ -95,8 +95,8 @@ export const userRemoveRouter = createTRPCRouter({
             data: {
               id: generateId(),
               action: 'DELETE USER AS ADMIN',
-              description: `The admin ${admin.firstName} ${admin.lastName} deleted the user ${user.firstName} ${user.lastName}`,
-            },
+              description: `The admin ${admin.firstName} ${admin.lastName} deleted the user ${user.firstName} ${user.lastName}`
+            }
           });
 
           await ctx.db.userRole.delete({ where: { userId: user.id } });
@@ -117,8 +117,8 @@ export const userRemoveRouter = createTRPCRouter({
           data: {
             id: generateId(),
             action: 'FAILED DELETE USER AS ADMIN',
-            description: 'Someone tried to delete a user',
-          },
+            description: 'Someone tried to delete a user'
+          }
         });
 
         unknownError();
@@ -128,8 +128,8 @@ export const userRemoveRouter = createTRPCRouter({
   removeAllUsers: publicProcedure
     .input(
       z.object({
-        developerKey: z.string().min(1),
-      }),
+        developerKey: z.string().min(1)
+      })
     )
     .mutation(async ({ ctx, input }) => {
       try {
@@ -146,8 +146,8 @@ export const userRemoveRouter = createTRPCRouter({
             data: {
               id: generateId(),
               action: 'DELETE ALL USERS',
-              description: `The super admin ${developer.firstName} ${developer.lastName} deleted all users`,
-            },
+              description: `The super admin ${developer.firstName} ${developer.lastName} deleted all users`
+            }
           });
 
           await ctx.db.userRole.deleteMany();
@@ -166,11 +166,11 @@ export const userRemoveRouter = createTRPCRouter({
           data: {
             id: generateId(),
             action: 'FAILED DELETE ALL',
-            description: 'Someone tried to delete all users',
-          },
+            description: 'Someone tried to delete all users'
+          }
         });
 
         unknownError();
       }
-    }),
+    })
 });
