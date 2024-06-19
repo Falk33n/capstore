@@ -1,5 +1,5 @@
 import { Pencil, Trash2 } from 'lucide-react';
-import type { UserTableProps } from '../../_types/_index';
+import type { AdminUserEditProps } from '../../_types/_index';
 import {
   Button,
   Dialog,
@@ -13,7 +13,7 @@ import {
   Label
 } from '../_index';
 
-const userTablePropsMapped: Record<keyof UserTableProps, string> = {
+const AdminUserEditPropsMapped: Record<keyof AdminUserEditProps, string> = {
   firstName: 'First Name',
   lastName: 'Last Name',
   country: 'Country',
@@ -25,11 +25,11 @@ const userTablePropsMapped: Record<keyof UserTableProps, string> = {
   developer: 'Developer'
 };
 
-export function AdminEditAction({ user }: { user: UserTableProps }) {
+export function AdminEditAction({ user }: { user: AdminUserEditProps }) {
   return (
     <Dialog>
       <DialogTrigger asChild title='Edit'>
-        <Button className='mr-2.5 size-7 rounded-md p-1.5'>
+        <Button size='icon' className='mr-2.5 rounded-md'>
           <Pencil className='size-full' />
         </Button>
       </DialogTrigger>
@@ -45,7 +45,7 @@ export function AdminEditAction({ user }: { user: UserTableProps }) {
           {Object.entries(user).map(([prop, val], i) => (
             <div key={i} className='grid grid-cols-4 items-center gap-4'>
               <Label htmlFor={prop} className='text-right'>
-                {userTablePropsMapped[prop as keyof UserTableProps]}
+                {AdminUserEditPropsMapped[prop as keyof AdminUserEditProps]}
               </Label>
               <Input
                 id={prop}
@@ -67,7 +67,7 @@ export function AdminDeleteAction({ email }: { email: string }) {
   return (
     <Dialog>
       <DialogTrigger asChild title='Delete'>
-        <Button variant='destructive' className='size-7 rounded-md p-1.5'>
+        <Button variant='destructive' size='icon' className='rounded-md'>
           <Trash2 className='size-full' />
         </Button>
       </DialogTrigger>

@@ -1,6 +1,28 @@
-export type UsersCommandProps = 'create' | 'remove' | 'getByEmail' | 'getById' | 'getAll' | 'edit';
+export type UsersCommandProps =
+  | 'create'
+  | 'remove'
+  | 'getByEmail'
+  | 'getById'
+  | 'getAll'
+  | 'edit';
 
-export type UserTableProps = {
+export type SortProps = 'unsorted' | 'a-z' | 'z-a';
+
+export type AdminUserSortProps = 
+  {
+    email: SortProps;
+    fullName: SortProps;
+    fullAddress: SortProps;
+    role: SortProps;
+  }
+
+
+export type AdminUserSortValueProps = {
+  original: AdminUserEditProps[];
+  sorted: AdminUserEditProps[];
+};
+
+export type AdminUserEditProps = {
   firstName: string;
   lastName: string;
   country: string;
@@ -8,6 +30,6 @@ export type UserTableProps = {
   postalCode: string;
   address: string;
   email: string;
-  admin: boolean;
-  developer: boolean;
+  admin: string;
+  developer: string;
 };
