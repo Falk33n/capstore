@@ -3,13 +3,13 @@ import {
   AdminUserActions,
   Menubar,
   MenubarMenu,
-  MenubarTrigger,
+  MenubarTrigger
 } from '../../_components/_index';
 
 export default function AdminActions() {
   return (
     <AdminAuth>
-      <div className='flex flex-col items-center gap-7 mt-28 min-w-[90%] sm:min-w-[75%] lg:min-w-[900px] h-full'>
+      <div className='my-28 flex w-[90%] flex-col items-center gap-7 sm:w-[75%] lg:max-w-[1400px]'>
         <Menubar className='w-fit'>
           <MenubarMenu>
             <MenubarTrigger>Users</MenubarTrigger>

@@ -5,4 +5,5 @@ export * from './charts.admin';
 export * from './header.admin';
 export * from './searchbar.admin';
 export * from './sidebar.admin';
+export * from './sortButton.admin';
 export * from './userActions.admin';
