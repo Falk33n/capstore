@@ -6,8 +6,8 @@ import {
   AdminHeader,
   AdminSearchbar,
   AdminSidebar,
-  Separator,
-} from '../../_components/_index';
+  Separator
+} from '../../../components';
 
 // The main page of the admin route
 export default function AdminDashboard() {
@@ -15,14 +15,14 @@ export default function AdminDashboard() {
     <AdminAuth>
       <AdminSidebar />
 
-      <div className='flex flex-col gap-3.5 p-4 md:p-12 md:pt-8 min-w-full sm:min-w-[92.5%] min-h-full sm:min-h-[87.5%]'>
+      <div className='flex min-h-full min-w-full flex-col gap-3.5 p-4 sm:min-h-[87.5%] sm:min-w-[92.5%] md:p-12 md:pt-8'>
         <section>
           <AdminHeader />
         </section>
 
         <AdminSearchbar />
 
-        <div className='flex md:flex-row flex-col md:flex-wrap md:justify-between gap-y-3.5'>
+        <div className='flex flex-col gap-y-3.5 md:flex-row md:flex-wrap md:justify-between'>
           <AdminCard
             title='insert active today'
             desc='Total visitors today'
@@ -55,14 +55,14 @@ export default function AdminDashboard() {
 
         <Separator className='my-3.5' />
 
-        <div className='flex md:flex-row flex-col md:items-center gap-3.5'>
-          <div className='md:flex-1 md:-mb-5 md:-ml-8'>
+        <div className='flex flex-col gap-3.5 md:flex-row md:items-center'>
+          <div className='md:-mb-5 md:-ml-8 md:flex-1'>
             <AdminFullChart />
           </div>
 
-          <div className='md:relative flex flex-col gap-3.5 md:pl-7 md:w-[29rem]'>
+          <div className='flex flex-col gap-3.5 md:relative md:w-[29rem] md:pl-7'>
             <Separator
-              className='md:block md:top-0 md:left-1.5 md:absolute hidden'
+              className='hidden md:absolute md:left-1.5 md:top-0 md:block'
               orientation='vertical'
             />
 

@@ -4,7 +4,7 @@ import {
   Menubar,
   MenubarMenu,
   MenubarTrigger
-} from '../../_components/_index';
+} from '../../../components';
 
 export default function AdminActions() {
   return (
